@@ -1,0 +1,10 @@
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Solid black rounded square background --><rect width="500" height="500" rx="40" ry="40" fill="#000000"/>
+
+  <!-- Activity/pulse icon in white --><path d="M125 250h46.875l31.25-93.75 62.5 187.5 31.25-93.75h46.875"
+         stroke="#FFFFFF"
+         stroke-width="39.0625"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"/>
+</svg>

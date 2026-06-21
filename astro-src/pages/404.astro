@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { NotFound } from '@/pages/NotFound'
+
+// NotFound sets its own inline SEO in the SPA; mirror those values here so the
+// static <head> is correct. `path: '/404'` matches the SPA's useSEO call.
+const seo = {
+  title: 'Page Not Found | VibeXP',
+  description: "The page you're looking for doesn't exist or may have moved.",
+  path: '/404',
+} as const
+---
+
+<BaseLayout {...seo}>
+  <!-- Static back-home link (router shim renders <a href="/">) → zero JS. -->
+  <NotFound />
+</BaseLayout>

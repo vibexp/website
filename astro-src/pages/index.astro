@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { Home } from '@/pages/Home'
+import { getPageSEO } from '@/utils/seo'
+
+const seo = getPageSEO('home')
+---
+
+<BaseLayout {...seo}>
+  <!--
+    The homepage is interactive throughout (carousel, sticky CTA, FAQ, CTAs), so
+    it hydrates as a single island to guarantee behaviour + pixel parity with the
+    SPA. Astro still server-renders it to content-rich static HTML at build time,
+    which is the SEO win; the island only adds the client-side interactivity.
+  -->
+  <Home client:load />
+</BaseLayout>

@@ -1,0 +1,74 @@
+<svg viewBox="0 0 640 360" style="width:100%;height:auto" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tl dl">
+  <title id="tl">VibeXP works solo and compounds with your team's shared knowledge base.</title>
+  <desc id="dl">On the left, one person is linked to their own small VibeXP knowledge base. On the right, four people all connect to a single, larger shared knowledge base with two-way links — each contributing to and benefiting from it — so shared knowledge compounds across the team.</desc>
+  <defs>
+    <filter id="scl" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity=".07"></feDropShadow></filter>
+    <filter id="shl" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="5" stdDeviation="10" flood-color="#000000" flood-opacity=".22"></feDropShadow></filter>
+    <mask id="sol" maskUnits="userSpaceOnUse" x="188" y="150" width="44" height="44">
+      <rect x="188" y="150" width="44" height="44" rx="12" fill="#ffffff"></rect>
+      <svg x="194" y="161" width="32" height="25" viewBox="118 150 276 212" overflow="visible"><path d="M128 256h48l32-96 64 192 32-96h48" fill="none" stroke="#000000" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    </mask>
+    <mask id="tel" maskUnits="userSpaceOnUse" x="467" y="149" width="66" height="66">
+      <rect x="467" y="149" width="66" height="66" rx="17" fill="#ffffff"></rect>
+      <svg x="477" y="165" width="46" height="36" viewBox="118 150 276 212" overflow="visible"><path d="M128 256h48l32-96 64 192 32-96h48" fill="none" stroke="#000000" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    </mask>
+  </defs>
+
+
+  <line x1="316" y1="66" x2="316" y2="300" stroke="currentColor" stroke-opacity=".11" stroke-width="1" stroke-dasharray="2 8"></line>
+  <g transform="translate(316 183)" stroke="currentColor" stroke-opacity=".34" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-5 -7 L2 0 L-5 7"></path><path d="M3 -7 L10 0 L3 7"></path>
+  </g>
+
+
+  <g fill="none" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--primary,currentColor)">
+    <path d="M126 172L182 172"></path>
+  </g>
+  <g style="fill:var(--primary,currentColor)">
+    <path d="M182 172L175 175.6L175 168.4Z"></path><path d="M126 172L133 175.6L133 168.4Z"></path>
+  </g>
+
+
+  <g filter="url(#shl)"><rect x="188" y="150" width="44" height="44" rx="12" mask="url(#sol)" style="fill:var(--primary,currentColor)"></rect></g>
+
+  <g filter="url(#scl)"><circle cx="96" cy="172" r="26" fill="currentColor" fill-opacity=".04"></circle></g>
+  <circle cx="96" cy="172" r="26" fill="none" stroke="currentColor" stroke-opacity=".14" stroke-width="1.4"></circle>
+  <g transform="translate(96 172)" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="-6" r="5.5"></circle><path d="M-9 10 C-9 1.5 9 1.5 9 10"></path></g>
+
+
+  <g fill="none" stroke="currentColor">
+    <circle cx="500" cy="182" r="46" stroke-opacity=".13"></circle>
+    <circle cx="500" cy="182" r="62" stroke-opacity=".06"></circle>
+  </g>
+
+  <g fill="none" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--primary,currentColor)">
+    <path d="M453.5 136.9L471.3 154.1"></path><path d="M546.5 136.9L528.7 154.1"></path><path d="M453.5 227.1L471.3 209.9"></path><path d="M546.5 227.1L528.7 209.9"></path>
+  </g>
+  <g style="fill:var(--primary,currentColor)">
+    <path d="M471.3 154.1L463.8 151.8L468.8 146.7Z"></path><path d="M453.5 136.9L456 144.4L461.1 139.2Z"></path>
+    <path d="M528.7 154.1L531.2 146.7L536.2 151.8Z"></path><path d="M546.5 136.9L538.9 139.2L544 144.4Z"></path>
+    <path d="M471.3 209.9L468.8 217.3L463.8 212.2Z"></path><path d="M453.5 227.1L461.1 224.8L456 219.6Z"></path>
+    <path d="M528.7 209.9L536.2 212.2L531.2 217.3Z"></path><path d="M546.5 227.1L544 219.6L538.9 224.8Z"></path>
+  </g>
+
+  <g filter="url(#shl)"><rect x="467" y="149" width="66" height="66" rx="17" mask="url(#tel)" style="fill:var(--primary,currentColor)"></rect></g>
+
+  <g filter="url(#scl)"><circle cx="432" cy="116" r="26" fill="currentColor" fill-opacity=".04"></circle></g>
+  <circle cx="432" cy="116" r="26" fill="none" stroke="currentColor" stroke-opacity=".14" stroke-width="1.4"></circle>
+  <g transform="translate(432 116)" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="-6" r="5.5"></circle><path d="M-9 10 C-9 1.5 9 1.5 9 10"></path></g>
+  <g filter="url(#scl)"><circle cx="568" cy="116" r="26" fill="currentColor" fill-opacity=".04"></circle></g>
+  <circle cx="568" cy="116" r="26" fill="none" stroke="currentColor" stroke-opacity=".14" stroke-width="1.4"></circle>
+  <g transform="translate(568 116)" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="-6" r="5.5"></circle><path d="M-9 10 C-9 1.5 9 1.5 9 10"></path></g>
+  <g filter="url(#scl)"><circle cx="432" cy="248" r="26" fill="currentColor" fill-opacity=".04"></circle></g>
+  <circle cx="432" cy="248" r="26" fill="none" stroke="currentColor" stroke-opacity=".14" stroke-width="1.4"></circle>
+  <g transform="translate(432 248)" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="-6" r="5.5"></circle><path d="M-9 10 C-9 1.5 9 1.5 9 10"></path></g>
+  <g filter="url(#scl)"><circle cx="568" cy="248" r="26" fill="currentColor" fill-opacity=".04"></circle></g>
+  <circle cx="568" cy="248" r="26" fill="none" stroke="currentColor" stroke-opacity=".14" stroke-width="1.4"></circle>
+  <g transform="translate(568 248)" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="-6" r="5.5"></circle><path d="M-9 10 C-9 1.5 9 1.5 9 10"></path></g>
+
+
+  <g fill="currentColor" opacity=".62" font-size="14" font-weight="600" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+    <text x="153" y="320">Solo</text>
+    <text x="500" y="320">Team</text>
+  </g>
+</svg>
