@@ -1,0 +1,131 @@
+---
+import { defaultSEO, type SEOProps } from '@/utils/seo'
+import { GTM_ID } from '@/utils/gtm'
+import {
+  escapeJsonLd,
+  organizationSchema,
+  softwareApplicationSchema,
+} from '@/lib/structuredData'
+
+type Props = SEOProps
+
+const {
+  title,
+  description,
+  path,
+  keywords,
+  type = 'website',
+  image,
+  twitterImage,
+} = Astro.props
+
+const canonical = `${defaultSEO.baseUrl}${path}`
+// Per-page override, else the shared CDN cards. No og:image:width/height are
+// emitted (scrapers read the real dimensions), so the assets can be re-exported
+// at the ideal size without a code change.
+const ogImage = image ?? defaultSEO.ogImage
+const twitterCardImage = twitterImage ?? defaultSEO.twitterImage
+
+// Every page describes the product via SoftwareApplication schema. Organization
+// is emitted on every page.
+const primarySchema = softwareApplicationSchema
+
+// Consent Mode v2 bootstrap — MUST run before GTM loads. Sets all consent
+// signals to 'denied' by default (GDPR-safe) and re-grants from a prior
+// localStorage decision. Ported verbatim from the SPA's index.html.
+const consentBootScript = `
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+  try {
+    var consentStr = localStorage.getItem('cookieConsent');
+    if (consentStr) {
+      var consentData = JSON.parse(consentStr);
+      if (consentData.status === 'granted') {
+        setTimeout(function() {
+          gtag('consent', 'update', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+          });
+        }, 0);
+      }
+    }
+  } catch (e) {}
+`
+
+// Standard GTM loader. Loaded only in production builds, matching the SPA, which
+// initializes GTM/Sentry only when running in prod.
+const gtmLoaderScript = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`
+---
+
+<meta charset="UTF-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=5"
+/>
+<meta name="theme-color" content="#000000" />
+
+<!-- Consent Mode v2 must initialize before GTM. -->
+<script is:inline set:html={consentBootScript} />
+{import.meta.env.PROD && GTM_ID && <script is:inline set:html={gtmLoaderScript} />}
+
+<!-- Icons & manifest -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="alternate icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+
+<!-- Perf hints -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://www.googletagmanager.com" />
+<link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+<!-- Primary meta -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+{keywords && <meta name="keywords" content={keywords} />}
+<meta name="author" content={defaultSEO.siteName} />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href={canonical} />
+
+<!-- Open Graph -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={title} />
+<meta property="og:site_name" content={defaultSEO.siteName} />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content={defaultSEO.twitterHandle} />
+<meta name="twitter:creator" content={defaultSEO.twitterHandle} />
+<meta name="twitter:url" content={canonical} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={twitterCardImage} />
+<meta name="twitter:image:alt" content={title} />
+
+<!-- Structured data -->
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={escapeJsonLd(primarySchema)}
+/>
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={escapeJsonLd(organizationSchema)}
+/>
