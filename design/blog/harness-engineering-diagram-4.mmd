@@ -1,0 +1,21 @@
+sequenceDiagram
+  participant You
+  participant Harness
+  participant Model
+  participant Sandbox as Sandbox + Tools
+
+  You->>Harness: The checkout test is failing, fix it
+  Note over Harness: Context layer picks the<br/>relevant files to show
+  Harness->>Model: Here is the task plus the test code
+  Model->>Harness: Plan, first run the test to see the error
+  Harness->>Sandbox: Run the test (permission, allowed)
+  Sandbox->>Harness: Error, null value on line 42
+  Note over Harness: Observation fed back in
+  Harness->>Model: Here is the error
+  Model->>Harness: Edit line 42 to handle the null, then re-run
+  Harness->>Sandbox: Apply edit and run test
+  Sandbox->>Harness: All tests pass
+  Harness->>Model: Verify, is it green?
+  Model->>Harness: Yes, done
+  Harness->>You: Fixed. Here is exactly what changed.
+  Note over Harness: Observability logged every step

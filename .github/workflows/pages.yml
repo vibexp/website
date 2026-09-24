@@ -1,0 +1,104 @@
+name: Site
+
+# Publishes the landing page, the feature pages, the documentation and the blog
+# to GitHub Pages at https://vibexp.io.
+#
+# The site bakes in the latest vibexp/vibexp release: its version in the hero
+# and the image tag in the install section (scripts/fetch-release.mjs). The
+# sibling SlackCLI and Agento sites rebuild on their own `release` event, but a
+# release here happens in a DIFFERENT repository, which cannot trigger this
+# workflow by itself. So it runs on three things besides a push:
+#
+#   - `repository_dispatch` of type `vibexp-release`, for vibexp/vibexp's
+#     release workflow to send once it publishes (needs a token with access to
+#     this repo; until that step exists, the schedule below covers it);
+#   - a daily schedule, so a missed dispatch costs at most a day of showing the
+#     previous version;
+#   - `workflow_dispatch`, to rebuild by hand.
+#
+# The address is stated once, in site.config.mjs; the custom domain is
+# public/CNAME, and DNS lives in shaharia-lab/infrastructure. Nothing here
+# needs to know either.
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [vibexp-release]
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+# Every action is pinned to a full commit SHA, and only GitHub-owned actions are
+# used, matching the sibling sites. A composite action's own `uses:` lines are
+# resolved against the same rules on the runner, and all three Pages actions
+# below are on versions that SHA-pin their own dependencies; check `action.yml`
+# at the tag before bumping any of them.
+
+# The two write scopes this workflow needs live on the `deploy` job, not here.
+# `build` runs `npm ci` over the whole Astro dependency tree and then executes
+# the site build, so it must not hold an OIDC token or Pages write: a
+# compromised build-time dependency would otherwise be able to mint an OIDC
+# identity for this repository, or publish to Pages, without ever reaching
+# `deploy`.
+permissions:
+  contents: read
+
+# One deploy at a time; a queued run is superseded rather than racing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci --ignore-scripts
+
+      - name: Build
+        # The token lifts the release API's unauthenticated rate limit. The
+        # build falls back to "latest" without it, so a rate limit degrades the
+        # version pill rather than failing the run.
+        #
+        # PUBLIC_GTM_ID is a repository variable, not a secret: a container id
+        # is visible in the page source of every site that loads one. Unset, the
+        # build emits no analytics and no cookie banner at all, which is what
+        # keeps the tag off fork builds and off `npm run dev`; see gtmId() in
+        # site.config.mjs. Only this workflow publishes, so only this workflow
+        # passes it, and the site-check job builds without it deliberately.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}
+        run: npm run build
+
+      - name: Check links
+        run: npm run check:links
+
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    # A job-level `permissions:` block REPLACES the workflow-level one rather
+    # than extending it, so nothing here inherits `contents: read`; it is
+    # restated deliberately.
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

@@ -1,0 +1,148 @@
+# Self-Hosting
+
+VibeXP self-hosts with Docker Compose. The root
+[`docker-compose.yml`](https://github.com/vibexp/vibexp/blob/main/docker-compose.yml)
+runs the **published** combined image plus PostgreSQL — it is for
+*running* VibeXP, not developing it (local development uses `make`; see
+[Getting Started](../getting-started.md)).
+
+:::tip[Looking for the end-user version?]
+There is also a user-facing [Self-Hosting](../../user-guide/self-hosting/README.md) guide. This
+page is the developer-guide deployment reference with the full hardening detail.
+:::
+
+## Prerequisites
+
+- **Docker** with the **Compose** plugin (`docker compose`).
+
+## Quick start
+
+```bash
+git clone https://github.com/vibexp/vibexp.git
+cd vibexp
+docker compose up -d
+```
+
+Then open:
+
+- **App:** http://localhost:8080
+- **API health:** http://localhost:8080/health
+
+Local evaluation uses a dev-login bypass, so there is nothing to configure to
+start clicking around.
+
+## What runs
+
+`docker compose up -d` starts two services:
+
+| Service | Image | Purpose |
+|---|---|---|
+| `postgres` | `pgvector/pgvector:pg17` | Database with the `pgvector` extension, with a healthcheck. |
+| `app` | `ghcr.io/vibexp/vibexp:latest` | The combined image: the Go backend embeds the frontend SPA and serves it, the REST API, and the MCP endpoint from one port (`8080`), same origin. |
+
+Data persists in the named volume **`pgdata`**, so it survives
+`docker compose down`. The compose healthcheck hits the app's `/ping`
+endpoint; the public health URL is `/health`.
+
+See [Docker & Compose](docker.md) for the full topology
+walkthrough.
+
+## How configuration works
+
+The backend reads a single required `config.yaml`. The published image bakes a
+production-neutral default at `/app/config.yaml` whose every value is a
+`${VAR:-default}` reference, so the compose file's `environment:` block on the
+`app` service configures it with plain env vars. To control every setting
+instead, mount your own `config.yaml` over the baked path (there is a commented
+`volumes:` entry on the `app` service) — start from `backend/config.example.yaml`.
+
+Compose is optional: with a reachable pgvector-enabled PostgreSQL, a single
+`docker run -p 8080:8080 -e DB_HOST=... ghcr.io/vibexp/vibexp:0.10.0` works
+anywhere. The image is multi-arch (`linux/amd64` + `linux/arm64`). See
+[Docker & Compose](docker.md) and the
+[Configuration Reference](configuration-reference.md).
+
+## Evaluating with dev-login
+
+The baked config ships with `auth.dev_login_enabled: true`, but the bypass
+**only works while `FRONTEND_BASE_URL` points at localhost** (the compose file
+sets `http://localhost:8080`), letting you sign in without any identity
+provider. Setting a real, non-localhost `FRONTEND_BASE_URL` automatically turns
+it off.
+
+## Before exposing it publicly
+
+:::danger
+The defaults in `docker-compose.yml` are for local evaluation only. For any real
+deployment, edit the `app` service environment before exposing it to the
+internet.
+:::
+
+- **`FRONTEND_BASE_URL`** — set your real public URL (e.g.
+  `https://<your-app-host>`) **first**. It is the single origin serving both the
+  SPA and the API, and pointing it away from `localhost` is what disables the
+  dev-login bypass. Leave it at `localhost` while exposing the app and dev login
+  stays open.
+- **`ENCRYPTION_KEY`** — required; **exactly 32 bytes** (AES-256). Generate one:
+  ```bash
+  openssl rand -base64 24 | cut -c1-32
+  ```
+- **`DB_PASSWORD`** — change it from the default (and keep it in sync with the
+  `postgres` service's `POSTGRES_PASSWORD`).
+- **`SESSION_ENCRYPTION_KEY`** — 64 hex chars (32 bytes) backing the session
+  cookie. Generate one: `openssl rand -hex 32`.
+- **An identity provider** — set `AUTH_PROVIDER` to `google`, `github`, or
+  `oidc` with the matching `*_CLIENT_ID` / `*_CLIENT_SECRET` (and
+  `*_REDIRECT_URI` if it differs from
+  `<FRONTEND_BASE_URL>/api/v1/auth/callback`). For several providers at once,
+  mount a `config.yaml` with `auth.providers: [...]`.
+- **MCP auth (optional)** — set `OAUTH_AS_ISSUER_URL` (your public HTTPS URL)
+  **and** `MCP_RESOURCE_URI` (`<url>/mcp/v1/common`) to enable the embedded
+  OAuth 2.1 Authorization Server that issues MCP tokens. In production its
+  endpoints **reject plain HTTP** (only localhost is exempt): terminate TLS at
+  your reverse proxy / load balancer and forward the original scheme as
+  `X-Forwarded-Proto: https`. Behind a proxy, also set `TRUSTED_PROXIES` to
+  its CIDR(s) so per-IP rate limiting keys on the real client IP instead of
+  collapsing every client into one bucket.
+- **`OUTBOUND_ALLOWED_CIDRS` (optional)**: the SSRF guard refuses outbound
+  calls to loopback and private addresses, so a self-hosted embedding or model
+  sidecar (TEI, Ollama, llama.cpp) on a private subnet is unreachable until you
+  declare its range here (e.g. `172.16.0.0/12` for Docker bridge networks).
+  Link-local (cloud metadata) and multicast can never be allowlisted, and an
+  entry that overlaps them fails startup.
+- **`DB_SSLMODE`**: set to `require` for managed Postgres that mandates TLS.
+- **`INSTANCE_ADMIN_EMAILS`**: comma-separated emails that get the
+  `/api/v1/admin` portal. Empty leaves it dormant.
+- **Sign-in allow-list (optional)**: set `AUTH_ALLOWED_DOMAINS` and/or
+  `AUTH_ALLOWED_EMAILS` to restrict who may sign in (a user is allowed if either
+  matches). While active it also requires a provider-verified email.
+
+For the full setting list, see the
+[Configuration Reference](configuration-reference.md)
+and [Backend Configuration](../backend/configuration.md).
+
+## Optional: file attachments
+
+File uploads need GCS-compatible object storage. The compose file ships a
+commented-out **GCS emulator** (`fsouza/fake-gcs-server`). To enable uploads,
+uncomment the `gcs` service and the `STORAGE_EMULATOR_HOST` /
+`GCS_RESOURCE_ATTACHMENTS_BUCKET` variables on the `app` service. See
+[Docker & Compose](docker.md).
+
+## Optional: semantic search
+
+Embeddings are generated **in-process** — there is no separate AI service. The
+embedding vector width is **fixed at 1024 in code** (locked to the pgvector
+column), so pick a model that outputs 1024 dimensions; providers are validated
+on save. Embedding providers are configured **per team in the app** (an
+OpenAI-compatible endpoint plus model, chunk sizing, concurrency, and optional
+query/document prefixes), not via environment variables. Changing a provider's
+identity wipes and re-embeds that team's data. Without a configured provider,
+embedding is skipped and entities still save; only semantic search is
+unavailable (keyword search still works).
+
+## Related
+
+- [Configuration Reference](configuration-reference.md)
+- [Docker & Compose](docker.md)
+- [Backend Configuration](../backend/configuration.md)

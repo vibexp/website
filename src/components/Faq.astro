@@ -1,0 +1,46 @@
+---
+/**
+ * An FAQ accordion.
+ *
+ * With no `items` it renders the landing FAQ from ../../faq.config.mjs; a
+ * feature page passes its own from features.config.mjs. Either way the same
+ * list is also emitted as `FAQPage` structured data by the page, so the two
+ * must come from one module and never be retyped here. See faq.config.mjs for
+ * why the answers are written out rather than linked.
+ */
+import { url } from '../../site.config.mjs';
+import { FAQ } from '../../faq.config.mjs';
+
+interface Item {
+  q: string;
+  a: string;
+  more: { label: string; path: string };
+}
+interface Props {
+  items?: Item[];
+}
+const items: Item[] = Astro.props.items ?? FAQ;
+---
+
+<section class="section" id="faq">
+  <div class="sheet panel">
+    <div class="eyebrow">
+      Frequently asked
+      <span class="eyebrow__end"><a href={url('/docs/')}>All documentation &#8599;</a></span>
+    </div>
+    <div class="rows">
+      {items.map((item, i) => (
+        <details class="faq" open={i === 0}>
+          <summary class="faq__q">
+            <span class="faq__chev" aria-hidden="true">&#9656;</span>
+            <span>{item.q}</span>
+          </summary>
+          <div class="faq__a">
+            <p>{item.a}</p>
+            <a class="faq__more" href={url(item.more.path)}>{item.more.label} &#8599;</a>
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
