@@ -8,3 +8,6 @@ src/data/repo.json
 dist/
 .astro/
 node_modules/
+
+# Claude Code worktrees (the update-docs skill works in one).
+.claude/worktrees/
