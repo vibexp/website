@@ -61,6 +61,19 @@ every PR. Run all three before committing.
 - **Config:** `site.config.mjs` is the one place the address, repos, consent and
   GTM helpers live. `REPO` is the product, `SITE_REPO` is this repo.
 
+## Documentation rules
+
+- **Docs track the latest published release of each product, never `main`.**
+  Validate every claim against the product source at its release tag
+  (`../vibexp`, `../cli`, ... checked out at the tag). `.vibexp-release` records
+  the core version the docs were last synced to.
+- The whole sync runs through the **`update-docs`** skill
+  (`.claude/skills/update-docs/SKILL.md`, scope `core`, `cli`, ... or `all`);
+  the `vibexp-release` scheduled job and vibexp/vibexp's `release` skill hand
+  their docs step to it. It ends at an approved, unmerged PR.
+- Writing style: no em dashes, concise, scannable (short paragraphs, lists and
+  tables over prose).
+
 ## Deployment (GitHub Pages)
 
 `pages.yml` builds and deploys on push to `main`, daily, on
