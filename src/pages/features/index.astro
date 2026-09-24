@@ -1,0 +1,73 @@
+---
+/**
+ * The features hub: every feature page, plus the capabilities that are
+ * documented but have no page of their own. Both lists come from
+ * features.config.mjs, so a page cannot exist without being listed here.
+ */
+import Page from '../../layouts/Page.astro';
+import StarCta from '../../components/StarCta.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { url, abs, SITE, SITE_NAME } from '../../../site.config.mjs';
+import { FEATURES, MORE_FEATURES } from '../../../features.config.mjs';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  '@id': abs('/features/'),
+  name: 'VibeXP features',
+  url: abs('/features/'),
+  isPartOf: { '@type': 'WebSite', '@id': `${SITE}${url('/')}#website`, name: SITE_NAME },
+  hasPart: FEATURES.map((f) => ({ '@type': 'WebPage', name: f.name, url: abs(`/features/${f.slug}/`) })),
+};
+---
+
+<Page
+  title="Features - one knowledge base for every AI tool | VibeXP"
+  description="Prompts, blueprints, memory, artifacts, feeds and semantic search in one shared knowledge base your AI tools read from and write back to over MCP. Free and open source."
+  current="features"
+>
+  <JsonLd slot="head" schema={schema} />
+
+  <div class="shell">
+    <section class="hero hero--sub">
+      <div class="hero__eyebrow">
+        <span class="pill">Features</span>
+        <span class="pill pill--plain">Free and open source</span>
+      </div>
+      <h1 class="hero__title">One knowledge base. <em>Every</em> AI tool.</h1>
+      <p class="hero__lede">
+        Prompts, rules, memory and artifacts in one shared place your tools read from and write back
+        to, so every AI session starts from what the last one learned.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href={url('/#install')}>Run VibeXP &#8594;</a>
+        <a class="btn" href={url('/how-it-works/')}>How it works</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <h2>The building blocks.</h2>
+        <span class="label">{FEATURES.length + MORE_FEATURES.length} of them</span>
+      </div>
+      <div class="rows">
+        {FEATURES.map((f) => (
+          <a class="row row--feature" href={url(`/features/${f.slug}/`)}>
+            <span class="row__t">{f.name}</span>
+            <span class="row__r">{f.summary}</span>
+            <span class="row__go">&#8594;</span>
+          </a>
+        ))}
+        {MORE_FEATURES.map((f) => (
+          <a class="row row--feature" href={url(f.path)}>
+            <span class="row__t">{f.name}</span>
+            <span class="row__r">{f.summary}</span>
+            <span class="row__go">&#8599;</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <StarCta />
+  </div>
+</Page>

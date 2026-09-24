@@ -1,0 +1,354 @@
+---
+/**
+ * The landing page.
+ *
+ * Everything here is hand-laid rather than generated: it is the one page whose
+ * job is persuasion, and it carries the design at full intensity. Offset
+ * shadows, the display serif, the single call to action. Docs and blog step
+ * the same vocabulary down.
+ *
+ * The order is an argument rather than a feature list. The agent session shows
+ * the loop working before anything is claimed about it; the three costs come
+ * before the building blocks, because somebody who does not recognise the
+ * problem does not care about the answer; and the task table sits above the
+ * install section because "I want my AI to stop forgetting" is the sentence
+ * that makes somebody scroll to it.
+ */
+import Page from '../layouts/Page.astro';
+import { url, abs, REPO, SITE, SITE_NAME, ORG, OG_IMAGE } from '../../site.config.mjs';
+import { FAQ } from '../../faq.config.mjs';
+import release from '../data/release.json';
+import Term from '../components/Term.astro';
+import Install from '../components/Install.astro';
+import StarCta from '../components/StarCta.astro';
+import Faq from '../components/Faq.astro';
+import JsonLd from '../components/JsonLd.astro';
+
+// Resolved at build time by scripts/fetch-release.mjs. Nothing about a version
+// is written by hand; with no answer from GitHub the pill says "latest".
+const { version } = release;
+
+/**
+ * What your AI can do with it, in the words somebody would actually use.
+ *
+ * This block carries most of the page's long-tail search surface, so every row
+ * is a real intent paired with the MCP tool that satisfies it. The tool names
+ * are the ones the server exposes, so an agent's transcript will show exactly
+ * these.
+ */
+const TASKS = [
+  {
+    q: 'Reuse the prompt that worked',
+    code: [{ t: 'vibexp_io_render_prompt', c: 'k' }, { t: '(slug: ' }, { t: '"code-review"', c: 's' }, { t: ')' }],
+    path: '/features/prompts/',
+  },
+  {
+    q: 'Give every tool the same rules',
+    code: [{ t: 'vibexp_io_get_resource', c: 'k' }, { t: '(resource_type: ' }, { t: '"blueprint"', c: 's' }, { t: ', slug: ' }, { t: '"claude-md"', c: 's' }, { t: ')' }],
+    path: '/features/blueprints/',
+  },
+  {
+    q: 'Remember what it learned',
+    code: [{ t: 'vibexp_io_create_memory', c: 'k' }, { t: '(content: ' }, { t: '"pool_max 50 fixed it"', c: 's' }, { t: ')' }],
+    path: '/features/memory/',
+  },
+  {
+    q: 'Find it again by meaning',
+    code: [{ t: 'vibexp_io_search', c: 'k' }, { t: '(query: ' }, { t: '"why do requests time out?"', c: 's' }, { t: ')' }],
+    path: '/docs/user-guide/search/',
+  },
+  {
+    q: 'Keep the report it wrote',
+    code: [{ t: 'vibexp_io_create_artifact', c: 'k' }, { t: '(title: ' }, { t: '"Q3 incident review"', c: 's' }, { t: ')' }],
+    path: '/features/artifacts/',
+  },
+  {
+    q: 'Follow an agent while it works',
+    code: [{ t: 'vibexp_io_post_to_feed', c: 'k' }, { t: '(content: ' }, { t: '"migration 3 of 5 done"', c: 's' }, { t: ')' }],
+    path: '/docs/user-guide/feeds/',
+  },
+  {
+    q: 'Connect how things relate',
+    code: [{ t: 'vibexp_io_link_resources', c: 'k' }, { t: '(relation: ' }, { t: '"governed-by"', c: 's' }, { t: ')' }],
+    path: '/docs/user-guide/relations/',
+  },
+];
+
+/**
+ * Structured data.
+ *
+ * Every value is derived rather than restated: the version comes from the same
+ * build-time fetch the hero does, and the FAQ comes from the same module the
+ * accordion renders, so a search engine cannot show an answer this page does
+ * not contain.
+ *
+ * `offers` at price 0 is not decoration. Without an explicit free offer a
+ * SoftwareApplication is shown with no pricing at all, which reads as
+ * "unknown", and free is one of the most load-bearing facts about this one.
+ */
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    '@id': `${SITE}${url('/')}#app`,
+    name: SITE_NAME,
+    alternateName: 'VibeXP shared AI knowledge base',
+    applicationCategory: 'DeveloperApplication',
+    applicationSubCategory: 'AI knowledge base',
+    operatingSystem: 'Linux, macOS, Windows (Docker)',
+    ...(version ? { softwareVersion: version } : {}),
+    downloadUrl: `${REPO}/releases/latest`,
+    installUrl: abs('/#install'),
+    url: abs('/'),
+    image: abs(OG_IMAGE.path),
+    license: `${REPO}/blob/main/LICENSE`,
+    isAccessibleForFree: true,
+    description:
+      'An open-source, self-hosted knowledge base for AI. Prompts, rules, memory and artifacts that Claude Code, Cursor, ChatGPT and every MCP client read from and write back to.',
+    featureList: [
+      'Reusable, composable prompt templates',
+      'Per-tool rules (CLAUDE.md, .cursorrules, AGENTS.md) in one library',
+      'Memory your AI writes and reads back across sessions',
+      'Versioned artifacts with diff and restore',
+      'Semantic search across everything',
+      'One MCP endpoint with browser sign-in, no API key',
+      'Team workspaces',
+    ],
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    author: { '@type': 'Organization', name: ORG.name, url: ORG.url },
+    sameAs: [REPO],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE}${url('/')}#website`,
+    name: SITE_NAME,
+    url: abs('/'),
+    publisher: { '@type': 'Organization', name: ORG.name, url: ORG.url },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': `${SITE}${url('/')}#faq`,
+    mainEntity: FAQ.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a.replace(/\s+/g, ' ').trim() },
+    })),
+  },
+];
+---
+
+<Page
+  title="VibeXP - the shared knowledge base your AI builds on"
+  description="Keep your prompts, rules, memory and past work in one place that Claude Code, Cursor, ChatGPT and every MCP client read from and write back to. Free, open source, self-hosted."
+>
+  <JsonLd slot="head" schema={schema} />
+
+  <div class="shell">
+    <section class="hero">
+      <div class="hero__eyebrow">
+        <span class="pill">{version ? `v${version}` : 'latest'}</span>
+        <span class="pill pill--plain">Self-hosted</span>
+        <span class="pill pill--plain">AGPL-3.0</span>
+        <span class="pill pill--plain">Any MCP client</span>
+      </div>
+
+      <h1 class="hero__title">Stop re-explaining everything to your <em>AI</em>.</h1>
+
+      <p class="hero__lede">
+        VibeXP is one shared knowledge base for your <b>prompts, rules, memory and past work</b>.
+        Claude Code, Cursor, ChatGPT and every other MCP client <b>read from it before a task and
+        write back to it after</b>, so each session starts from what the last one learned, for you
+        and for everyone on your team. It is free, open source, and it runs on <b>your own
+        server</b>.
+      </p>
+
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="#install">Run it in a minute &#8594;</a>
+        <a class="btn" href={url('/how-it-works/')}>How it works</a>
+        <span class="hero__note">One container. Your database. No account.</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat__n">1</div>
+          <div class="stat__k label">Endpoint for every AI tool</div>
+        </div>
+        <div class="stat">
+          <div class="stat__n">0</div>
+          <div class="stat__k label">API keys to paste</div>
+        </div>
+        <div class="stat">
+          <div class="stat__n">6</div>
+          <div class="stat__k label">Kinds of knowledge</div>
+        </div>
+        <div class="stat">
+          <div class="stat__n">AGPL</div>
+          <div class="stat__k label">Yours to run and change</div>
+        </div>
+      </div>
+
+      <Term />
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <h2>Three reasons this exists.</h2>
+        <span class="label">The problem</span>
+      </div>
+      <div class="pains">
+        <div class="sheet sheet--dashed pain">
+          <span class="pain__n">01</span>
+          <h4>You rewrite the same prompts</h4>
+          <p>
+            The instruction that finally worked is buried in a chat history, or in a teammate's notes
+            you will never see. So everybody reinvents it, slightly worse, every time.
+          </p>
+          <span class="pain__fix"><b>One prompt library, every tool</b></span>
+        </div>
+        <div class="sheet sheet--dashed pain">
+          <span class="pain__n">02</span>
+          <h4>You re-explain your context, constantly</h4>
+          <p>
+            Every session starts cold. You describe the project, the stack and the standards again,
+            to every tool, and nothing your AI worked out yesterday is there today.
+          </p>
+          <span class="pain__fix"><b>Memory it reads back first</b></span>
+        </div>
+        <div class="sheet sheet--dashed pain">
+          <span class="pain__n">03</span>
+          <h4>Your knowledge is trapped in silos</h4>
+          <p>
+            Rules in CLAUDE.md here and .cursorrules there, outputs in scratch files, lessons on one
+            laptop. None of it reaches the next session, let alone your team.
+          </p>
+          <span class="pain__fix"><b>One shared, searchable home</b></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="loop">
+      <div class="section__head">
+        <h2>Your AI does not just use it. It builds it.</h2>
+        <span class="label">The loop</span>
+      </div>
+      <div class="loop">
+        <div class="sheet card">
+          <span class="badge">1 &middot; Read</span>
+          <h4>Before a task</h4>
+          <p>
+            Your AI searches the relevant prompts, rules, memory and past work first, so it starts
+            with everything already learned instead of a blank slate.
+          </p>
+        </div>
+        <div class="sheet card">
+          <span class="badge">2 &middot; Work</span>
+          <h4>As it works</h4>
+          <p>
+            It saves new lessons, updates memory and stores what it produced, through the MCP write
+            tools. An explicit step the agent takes, not a guess.
+          </p>
+        </div>
+        <div class="sheet card">
+          <span class="badge">3 &middot; Write back</span>
+          <h4>Every session after</h4>
+          <p>
+            That richer knowledge is waiting, in every tool, for you and for every teammate. Built-in
+            AI memory is one tool and one person. This is all of them.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="what-it-does">
+      <div class="section__head">
+        <h2>What should your AI stop forgetting?</h2>
+        <span class="label">Over MCP</span>
+      </div>
+      <div class="tasks">
+        {TASKS.map((task) => (
+          <a class="task" href={url(task.path)}>
+            <span class="task__q">{task.q}</span>
+            <code class="task__c">
+              {task.code.map((tk) => (tk.c ? <span class={tk.c}>{tk.t}</span> : <span>{tk.t}</span>))}
+            </code>
+            <span class="task__go" aria-hidden="true">&#8594;</span>
+          </a>
+        ))}
+      </div>
+      <p class="osfoot">
+        <span class="label">Also</span>
+        <a href={url('/docs/user-guide/comments/')}>comments</a>
+        <span class="label">&middot;</span>
+        <a href={url('/docs/user-guide/metadata-filtering/')}>metadata filters</a>
+        <span class="label">&middot;</span>
+        <a href={url('/docs/user-guide/resource-access-analytics/')}>access analytics</a>
+        <span class="label">&middot;</span>
+        <a href={url('/docs/user-guide/blueprints/#importing-blueprints-from-github')}>GitHub import</a>
+        <span class="label">&middot;</span>
+        <a href={url('/features/')}>every feature</a>
+      </p>
+    </section>
+
+    <section class="section" id="solo-and-team">
+      <div class="section__head">
+        <h2>Better on your own. Better still with a team.</h2>
+        <span class="label">Who it is for</span>
+      </div>
+      <div class="ways">
+        <div class="sheet way">
+          <span class="way__tag">Day one</span>
+          <h3>Start solo</h3>
+          <p>
+            Put your prompts, rules and memory in one place today. Your own AI gets more consistent
+            from the first session, because it reads what you saved before it starts.
+          </p>
+          <ul class="way__list">
+            <li><b>Import what you have.</b> Bring a repo's CLAUDE.md, AGENTS.md and .cursorrules in as blueprints.</li>
+            <li><b>Every tool, one brain.</b> Terminal, editor, chat: whichever you reach for reads the same knowledge.</li>
+            <li><b>Nothing to maintain by hand.</b> Your AI writes the memory for you as it works.</li>
+          </ul>
+        </div>
+        <div class="sheet way">
+          <span class="way__tag">When you are ready</span>
+          <h3>Add your team</h3>
+          <p>
+            Invite people into a team workspace and it compounds. One person's prompt, rule or
+            hard-won lesson makes everyone's AI better, instead of each person quietly reinventing
+            it.
+          </p>
+          <ul class="way__list">
+            <li><b>Roles.</b> Owners, admins and members, with the permissions to match.</li>
+            <li><b>Feeds.</b> Background agents post their progress; you reply in the thread to steer.</li>
+            <li><b>History.</b> Every change is versioned and attributed, and any version restores.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="osfoot">
+        <span class="label">Read</span>
+        <a href={url('/docs/user-guide/team-roles-and-permissions/')}>Team roles and permissions</a>
+        <span class="label">&middot;</span>
+        <a href={url('/docs/user-guide/feeds/')}>Feeds</a>
+      </p>
+    </section>
+
+    <Install />
+
+    <Faq />
+
+    <StarCta />
+
+    <section class="closer">
+      <h2>Give your AI a knowledge base that grows.</h2>
+      <p>
+        One command to run it, one to connect your AI, and the next session starts from everything
+        the last one learned, for you and your team.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="#install">Run VibeXP {version ?? ''} &#8594;</a>
+        <a class="btn btn--ghost" href={REPO}>Star on GitHub</a>
+      </div>
+    </section>
+  </div>
+</Page>

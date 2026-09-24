@@ -1,0 +1,145 @@
+---
+/**
+ * The install section, and the page's primary conversion point.
+ *
+ * VibeXP is a server, not a binary, so this is shaped differently from the
+ * sibling sites' per-platform download list. There is one route that works the
+ * same everywhere Docker runs, and three rules shape how it is presented:
+ *
+ *   1. **Local evaluation is answered first and separately.** `docker compose
+ *      up` with the bundled file needs no configuration at all, and it is the
+ *      step that turns "interesting" into "I have it running". Everything else
+ *      is below it.
+ *   2. **Connecting an AI tool is part of installing**, not a later chapter.
+ *      A knowledge base nothing reads from is not installed yet, so the MCP
+ *      one-liner sits directly under the run command.
+ *   3. **Going public is a separate, explicit step.** The compose defaults are
+ *      for localhost only: until FRONTEND_BASE_URL points away from localhost,
+ *      a dev-login bypass lets anyone sign in as anyone. That is said here, in
+ *      the section people copy from, rather than left for the docs.
+ *
+ * The version and image tag come from the release API, never from a template.
+ * See scripts/fetch-release.mjs.
+ */
+import release from '../data/release.json';
+import { url } from '../../site.config.mjs';
+import CopyLine from './CopyLine.astro';
+
+const { image } = release;
+
+const ROUTES = [
+  {
+    id: 'run',
+    label: 'docker run, against your own Postgres',
+    hint: 'Postgres must have the pgvector extension available. The image reads every setting from environment variables.',
+    steps: [
+      {
+        t: 'Point the image at a database and give it an encryption key and its public address:',
+        code: `docker run -p 8080:8080 \\
+  -e DB_HOST=your-db-host -e DB_PASSWORD=secret \\
+  -e ENCRYPTION_KEY="$(openssl rand -base64 24 | cut -c1-32)" \\
+  -e FRONTEND_BASE_URL=https://vibexp.example.com \\
+  ${image}`,
+      },
+    ],
+    more: { label: 'Docker and Compose', path: '/docs/developer-guide/deployment/docker/' },
+  },
+  {
+    id: 'public',
+    label: 'Before you expose it to the internet',
+    hint: 'Leave FRONTEND_BASE_URL at localhost on a public host and anyone can sign in as any user.',
+    steps: [
+      {
+        t: 'Set your real public URL first. It is what switches off the local dev-login bypass:',
+        code: 'FRONTEND_BASE_URL=https://vibexp.example.com',
+      },
+      {
+        t: 'Replace the default secrets, and keep POSTGRES_PASSWORD in step with DB_PASSWORD:',
+        code: `ENCRYPTION_KEY=$(openssl rand -base64 24 | cut -c1-32)
+SESSION_ENCRYPTION_KEY=$(openssl rand -hex 32)
+DB_PASSWORD=...`,
+      },
+      {
+        t: 'Pick an identity provider, with its client id and secret:',
+        code: 'AUTH_PROVIDER=google   # or github, or oidc',
+      },
+    ],
+    more: { label: 'Self-hosting guide', path: '/docs/user-guide/self-hosting/' },
+  },
+];
+---
+
+<section class="section" id="install">
+  <div class="section__head">
+    <h2>Running on your machine in a minute.</h2>
+    <span class="label">Self-host</span>
+  </div>
+
+  <div class="sheet panel prereq">
+    <div class="eyebrow">
+      Try it locally
+      <span class="eyebrow__end"><a href={url('/docs/user-guide/self-hosting/')}>Full guide &#8599;</a></span>
+    </div>
+    <h3>Docker Compose, with nothing to configure</h3>
+    <p>
+      The bundled file runs the published image next to PostgreSQL with pgvector. The app and its API
+      share one port, and local evaluation signs you in without an identity provider, so the first
+      thing you see is the app itself.
+    </p>
+    <CopyLine code={'git clone https://github.com/vibexp/vibexp.git && cd vibexp && docker compose up -d'} />
+    <p class="prereq__then">
+      Then open <a class="literal" href="http://localhost:8080">http://localhost:8080</a>. Data lives in
+      the <code>pgdata</code> volume, so it survives a restart.
+    </p>
+  </div>
+
+  <div class="sheet panel prereq">
+    <div class="eyebrow">
+      Connect your AI
+      <span class="eyebrow__end"><a href={url('/docs/user-guide/mcp-server/')}>Every client &#8599;</a></span>
+    </div>
+    <h3>One MCP endpoint, a browser sign-in, no API key</h3>
+    <p>
+      Point any MCP client at your instance. The first call opens a consent screen in the browser;
+      approve it once and the client keeps its token. Cursor, VS Code, Gemini CLI, Codex and ChatGPT
+      take the same URL.
+    </p>
+    <CopyLine code={'claude mcp add --transport http vibexp http://localhost:8080/mcp/v1/common'} />
+  </div>
+
+  <div class="osgrid">
+    {ROUTES.map((route) => (
+      <details class="sheet oscard" data-route={route.id}>
+        <summary class="oscard__sum">
+          <span class="oscard__chev" aria-hidden="true">&#9656;</span>
+          <span class="oscard__label">{route.label}</span>
+        </summary>
+        <div class="oscard__body">
+          <ol class="osteps">
+            {route.steps.map((s) => (
+              <li>
+                <span>{s.t}</span>
+                <pre class="codeblock">{s.code}</pre>
+              </li>
+            ))}
+          </ol>
+          <p class="oshint label">{route.hint}</p>
+          <p class="osfoot">
+            <a href={url(route.more.path)}>{route.more.label} &#8599;</a>
+          </p>
+        </div>
+      </details>
+    ))}
+  </div>
+
+  <p class="osfoot">
+    <span class="label">Image</span>
+    <a class="literal" href="https://github.com/vibexp/vibexp/pkgs/container/vibexp">{image}</a>
+    <span class="label">&middot;</span>
+    <a href={release.url}>Release notes &#8599;</a>
+    <span class="label">&middot;</span>
+    <a href={url('/docs/user-guide/self-hosting/upgrading/')}>Upgrading</a>
+    <span class="label">&middot;</span>
+    <a href={url('/docs/developer-guide/deployment/self-hosting/')}>Kubernetes and bare binary</a>
+  </p>
+</section>

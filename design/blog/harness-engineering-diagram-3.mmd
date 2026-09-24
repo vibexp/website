@@ -1,0 +1,17 @@
+flowchart TB
+  M["THE MODEL<br/>(the only part that is not the harness)"]
+  M --> Loop["THE LOOP<br/>Observe to Plan to Act to Verify"]
+  Loop --> L1["Context: what the model is allowed to see this step"]
+  Loop --> L2["Tools: how the model acts on the real world"]
+  Loop --> L3["Memory: what carries over between sessions"]
+  Loop --> L4["Sandbox: a safe place where actions actually run"]
+  Loop --> L5["Permissions: what the agent is allowed to do"]
+  Loop --> L6["Observability: a record of what happened"]
+  style M fill:#d0bfff,stroke:#8b5cf6
+  style Loop fill:#e5dbff,stroke:#8b5cf6
+  style L1 fill:#a5d8ff,stroke:#2563eb
+  style L2 fill:#ffd8a8,stroke:#d97706
+  style L3 fill:#c3fae8,stroke:#0e7490
+  style L4 fill:#fff3bf,stroke:#d97706
+  style L5 fill:#ffc9c9,stroke:#dc2626
+  style L6 fill:#eebefa,stroke:#a21caf

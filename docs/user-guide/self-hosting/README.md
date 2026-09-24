@@ -1,0 +1,143 @@
+# Self-Hosting
+
+VibeXP is designed to be self-hosted on your own infrastructure and domain. There is **no committed secret or infrastructure-specific value** in the repository — every deployment supplies its own configuration through environment variables (or its own `config.yaml`).
+
+:::tip[Canonical reference]
+This page summarizes the deployment setup in the [`vibexp/vibexp`](https://github.com/vibexp/vibexp) repository — its root `docker-compose.yml` and `backend/config.example.yaml` are the canonical, always-current source for the authoritative setting list.
+:::
+
+## Prerequisites
+
+- **Docker + Docker Compose** (for the quick start), **or** Node 20+ / Go 1.25+ for local dev.
+- **PostgreSQL with the [`pgvector`](https://github.com/pgvector/pgvector) extension** (the bundled compose file uses `pgvector/pgvector:pg17`). On managed Postgres the connecting role must be allowed to `CREATE EXTENSION` for `vector`, `pg_trgm`, `pgcrypto`, and `uuid-ossp`, or migrations fail at startup. Already running the bundled Postgres on a populated volume? See [Upgrading Postgres to 17](postgres-pg17-migration.md) before you pull.
+- A **login provider** for production sign-in — Google, GitHub, or any OIDC provider (see [Authentication](#authentication)) — or use the dev-login bypass for local evaluation.
+- *(For semantic search)* an OpenAI-compatible embeddings endpoint configured in-app — see [Search and embeddings](#search-and-embeddings). No external embedding service is required to boot.
+
+## Quick start
+
+```bash
+git clone https://github.com/vibexp/vibexp.git
+cd vibexp
+docker compose up -d
+```
+
+The root `docker-compose.yml` runs the published combined `ghcr.io/vibexp/vibexp` image plus a PostgreSQL (pgvector) database. The app and the API share **one port**: open `http://localhost:8080` (API under `/api/v1`, same origin — no separate frontend URL). To configure it, edit the `environment:` block on the `app` service in `docker-compose.yml` before exposing it publicly (`backend/.env` is only used by the `make`-based local dev workflow, not by compose).
+
+## How configuration works
+
+The backend reads a single required `config.yaml`. The published image bakes a default at `/app/config.yaml` whose every value is a `${VAR:-default}` reference, so **environment variables alone configure a container** — that is what the compose `environment:` block feeds. To control every setting, mount your own file over `/app/config.yaml` (start from `backend/config.example.yaml`). Compose is optional; with a reachable pgvector-enabled PostgreSQL, one container is enough:
+
+```bash
+docker run -p 8080:8080 \
+  -e DB_HOST=your-db-host -e DB_PASSWORD=secret \
+  -e ENCRYPTION_KEY="$(openssl rand -base64 24 | cut -c1-32)" \
+  -e FRONTEND_BASE_URL=http://localhost:8080 \
+  ghcr.io/vibexp/vibexp:0.10.0
+```
+
+The localhost `FRONTEND_BASE_URL` enables the dev-login bypass so you can sign in immediately. For a real deployment, set `FRONTEND_BASE_URL` to your public URL **and** configure a login provider (`AUTH_PROVIDER` + its client credentials + `SESSION_ENCRYPTION_KEY` — see [Authentication](#authentication)); otherwise the instance boots but has no way to sign in.
+
+## Your domains
+
+The application's URLs are **yours** — they are not hardcoded. Throughout this documentation we use the deployment-agnostic placeholder `<your-vibexp-host>` for your instance. The app, API, and MCP endpoint all live on that **one origin** (the combined image serves the SPA, `/api/v1`, and `/mcp/v1/common` from the same port — no CORS to configure). Set it per deployment:
+
+| Concern | Env var | Notes |
+| --- | --- | --- |
+| Public base URL | `FRONTEND_BASE_URL` | the single origin serving app + API; drives auth redirects + email links |
+| MCP auth issuer | `OAUTH_AS_ISSUER_URL` | your public HTTPS URL; enables the embedded MCP OAuth server |
+| MCP resource URI | `MCP_RESOURCE_URI` | your MCP endpoint, e.g. `https://<your-vibexp-host>/mcp/v1/common` |
+
+The marketing **website**, **blog**, and **docs-site** are independent static sites; their public URLs and branding are configurable via their own `VITE_*` / `PUBLIC_*` env vars (see each service's `.env.example`).
+
+## Required configuration (backend)
+
+These are the only hard requirements to boot the backend. Everything else is optional and stays disabled until configured.
+
+| Env var | Required | Purpose |
+| --- | --- | --- |
+| `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` | ✅ | PostgreSQL connection (must have `pgvector`) |
+| `ENCRYPTION_KEY` | ✅ | AES-256 at-rest key — **exactly 32 bytes** |
+
+:::note
+Database migrations run automatically on boot; upgrading is a straight image
+bump. The published image is multi-arch (`linux/amd64` + `linux/arm64`).
+Upgrading to v0.9.0 drops the retired billing/subscription, AI-tool activity
+ingestion, and web-push tables automatically, and moves GitHub App
+configuration from `config.yaml` to per-team setup (re-register the App on
+each team after upgrading).
+:::
+
+There is no embedding env var: embedding and model providers are configured
+per team **in the app** (see [Search and embeddings](#search-and-embeddings)).
+
+## Authentication
+
+VibeXP is **provider-agnostic** and brings its **own embedded OAuth 2.1 Authorization Server** in-house to secure the MCP endpoint — no third-party auth service required. Choose **Google**, **GitHub**, or a **generic OIDC** provider (Keycloak / Zitadel / Auth0 / Okta / …) via `AUTH_PROVIDER`:
+
+```bash
+AUTH_PROVIDER=google                # one of: google, github, oidc
+SESSION_ENCRYPTION_KEY=<64 hex>     # encrypts the vx_session cookie
+```
+
+To enable **several providers at once**, mount your own `config.yaml` over `/app/config.yaml` with a provider list — the multi-provider `auth.providers` field is not settable via env vars:
+
+```yaml
+auth:
+  providers: ["google", "github"]
+```
+
+For **local evaluation without a provider**, point `FRONTEND_BASE_URL` at localhost (the bundled compose file sets `http://localhost:8080`) — that enables the dev-login bypass, which only works on localhost. The bare image leaves `FRONTEND_BASE_URL` empty, which keeps dev-login off (fail-closed).
+
+➡️ See **[Authentication & MCP Auth](authentication.md)** for per-provider setup, the embedded Authorization Server, the full env-var matrix, and the HTTPS expectation.
+
+## Search and embeddings
+
+Embeddings are generated **in-process** — an event-bus worker chunks, embeds, and stores content in pgvector. There is **no external AI service** to run and no `AI_SERVICE_URL`.
+
+The embedding provider (any OpenAI-compatible embeddings endpoint: OpenAI, Ollama, vLLM, TEI, …) is configured **per team, in-app**, not via environment variables: Settings → Integration → **Embedding Providers**. Each provider stores the endpoint, encrypted API key, model id, chunk sizing, request concurrency, and optional query/document prefixes. Providers are validated on save and must return **1024-dimension** vectors; the width is locked to the pgvector column and is not configurable.
+
+:::tip[Recommended prefixes per model family]
+Asymmetric embedding models want different instruction prefixes for queries vs. documents. The provider dialog ships one-click presets:
+
+| Model family | Query prefix | Document prefix |
+| --- | --- | --- |
+| mxbai-embed-large / BGE (English) | `Represent this sentence for searching relevant passages: ` | *(none)* |
+| E5 family | `query: ` | `passage: ` |
+| Symmetric models (e.g. OpenAI `text-embedding-3-*`) | *(none)* | *(none)* |
+
+Prefixes are added only to the text sent to the provider; nothing extra is stored. Leaving both empty is correct for symmetric models.
+:::
+
+The settings page also shows embedding **coverage** per team, with one-click **Reprocess pending** and **Clear all embeddings** actions. Changing a provider's identity (endpoint or model) wipes and re-embeds that team's data automatically.
+
+Teams can also bring their own OpenAI-compatible LLM endpoints under Settings → Integration → **Model Providers** (encrypted API keys, connectivity validation on save).
+
+:::caution[Running the endpoint on your own private network?]
+An SSRF guard refuses outbound calls to loopback and private addresses, so a sidecar on a Docker subnet or on localhost is unreachable by default. Declare its range in `OUTBOUND_ALLOWED_CIDRS` (for example `172.16.0.0/12` for Docker bridge networks, or `127.0.0.1/32` for a same-host Ollama). Link-local (cloud metadata) and multicast ranges can never be allowlisted, and an entry that overlaps them fails startup. Local development is already exempt.
+:::
+
+:::caution
+Without a configured embedding provider, CRUD operations still work, but **semantic search is unavailable**: search falls back to keyword (full-text) mode, which since v0.6.0 includes typo tolerance.
+:::
+
+## Optional integrations
+
+All disabled by default, enabled via env vars or a mounted `config.yaml` (see `backend/config.example.yaml`):
+
+| Integration | Enable via | Behavior when off |
+| --- | --- | --- |
+| **Object storage** (attachments) | GCS-compatible storage: `GCS_RESOURCE_ATTACHMENTS_BUCKET` (+ `STORAGE_EMULATOR_HOST` for an emulator) | Uploads return `503` |
+| **Email** | `EMAIL_PROVIDER` (`smtp`, `mailgun`, `postmark`, `sendgrid`) + the provider's credentials | Email features disabled |
+| **Analytics** | `VITE_GTM_ID` / `VITE_GA4_MEASUREMENT_ID` (Google Tag Manager / GA4). Setting `VITE_GTM_ID` **is** the opt-in; there is no separate enable flag, and VibeXP ships no cookie-consent gate of its own | No analytics |
+| **Private-network outbound calls** | `OUTBOUND_ALLOWED_CIDRS` (comma-separated, e.g. `172.16.0.0/12`) so the SSRF guard may reach a self-hosted embedding or model sidecar | Loopback and private destinations are refused |
+| **Telemetry** | `otel.*` in a mounted `config.yaml` (any OTLP collector) | No telemetry |
+| **GitHub App** | Not an env var: each team registers its own App in-app under Settings → GitHub Integration ([setup](../integrations/github-app.md)) | Team has no GitHub integration |
+
+## Branding
+
+The "VibeXP" name and logo are the project maintainer's brand. To white-label the app, set the branding env vars on the `app` service (`VITE_SITE_NAME`, `VITE_SITE_URL`, `VITE_BRAND_LOGO_URL`, …) — they are served to the SPA at runtime via `/config.js`, so a restart applies them without a rebuild. The independent static sites (website, blog, docs) have their own `VITE_*` / `PUBLIC_*` env vars in their repos.
+
+## Next steps
+
+- [Open Source](../open-source/README.md) — license model and where to file issues.
+- [Contributing](../contributing.md) — set up a dev environment and open a PR.

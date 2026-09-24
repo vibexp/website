@@ -1,0 +1,55 @@
+/* ==========================================================================
+   VibeXP site - design tokens
+
+   These are not defined here. They come from @shaharia-lab/agento-code, the
+   published design system shared by every Shaharia Lab open-source project
+   site, so there is one definition of the brand rather than one per site.
+
+   The file is kept as a shim rather than deleted because it is imported from
+   two places that cannot see each other: src/layouts/Page.astro for the
+   landing page and blog, and `customCss` in astro.config.mjs for the Starlight
+   half. One import list is easier to keep honest than two.
+
+   NOTE the package's own entry point, styles.css, is deliberately NOT used.
+   Its first line is tokens/fonts.css, which pulls the four families from
+   Google Fonts; this site self-hosts them through @fontsource (see fonts.css,
+   and the reason written there). Importing the token files individually is
+   what keeps that true. Everything else styles.css imports is listed below, in
+   its order.
+   ========================================================================== */
+@import '@shaharia-lab/agento-code/tokens/colors.css';
+@import '@shaharia-lab/agento-code/tokens/accents.css';
+@import '@shaharia-lab/agento-code/tokens/typography.css';
+@import '@shaharia-lab/agento-code/tokens/space.css';
+@import '@shaharia-lab/agento-code/tokens/borders.css';
+@import '@shaharia-lab/agento-code/tokens/motion.css';
+@import '@shaharia-lab/agento-code/base.css';
+
+/* The two variable faces are self-hosted from @fontsource-variable, which
+   registers them as "Newsreader Variable" and "JetBrains Mono Variable". The
+   design system's typography tokens name the plain families - the names its
+   own Google Fonts import uses - so without this every heading set in
+   --font-sub and every line of code on the site silently falls back to
+   Georgia and the system monospace. The sibling SlackCLI and Agento sites
+   carry the same gap; the fix belongs in each of them too. */
+:root {
+  --font-sub: "Newsreader Variable", "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-serif-text: "Newsreader Variable", "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+/* The `ink` accent, for BOTH halves of the site. The design system picks an
+   accent with `data-accent` on <html>, and src/layouts/Page.astro sets it - but
+   Starlight builds its own <html> for the docs and never carries the
+   attribute, so the docs fell back to the default forest green: green sidebar
+   highlight, green links, green heading anchors. Pointing the live accent at
+   ink here, in the one stylesheet both halves import, makes the choice hold
+   everywhere with no script involved. These are the same four assignments as
+   accents.css's `ink` block, and they follow the theme because --ink, --sunken
+   and --paper do. */
+:root {
+  --accent: var(--ink);
+  --accent-tint: var(--sunken);
+  --accent-deep: var(--ink);
+  --on-accent: var(--paper);
+}

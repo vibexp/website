@@ -1,0 +1,184 @@
+---
+/**
+ * How it works: the loop, the connection, and the four ways people use it.
+ *
+ * The landing page argues; this page explains. It assumes the reader already
+ * recognises the problem and wants the mechanism, so it opens on the building
+ * blocks rather than the costs, and every block links to the docs page that
+ * says the same thing at length.
+ */
+import Page from '../layouts/Page.astro';
+import StarCta from '../components/StarCta.astro';
+import JsonLd from '../components/JsonLd.astro';
+import CopyLine from '../components/CopyLine.astro';
+import { url, abs, SITE, SITE_NAME } from '../../site.config.mjs';
+import { FEATURES } from '../../features.config.mjs';
+
+const BLOCKS = FEATURES.filter((f) => ['prompts', 'blueprints', 'memory', 'artifacts'].includes(f.slug));
+
+const USES = [
+  {
+    tag: 'Solo',
+    h: 'An AI that finally remembers',
+    p: 'Organize your prompts, bring in your repo\'s rules, and have your AI log decisions and lessons as it works. Next task, it reads them back first and stops repeating mistakes. That is the value on day one, before anyone else joins.',
+  },
+  {
+    tag: 'Team',
+    h: 'Shared knowledge, not silos',
+    p: 'Invite your team and everything compounds. One teammate\'s prompt, rule or hard-won lesson makes everyone\'s AI better, instead of each person quietly reinventing it.',
+  },
+  {
+    tag: 'Agents',
+    h: 'A feed you can follow',
+    p: 'Agents running in CI, the cloud or an unattended terminal are already connected over MCP, so they post each update straight to a VibeXP feed. Follow the work like a news feed and reply to steer it.',
+  },
+  {
+    tag: 'Everywhere',
+    h: 'One consistent brain',
+    p: 'Terminal, editor, chat: switch freely without losing anything. Whatever tool you reach for reads the same knowledge, so results stay consistent everywhere.',
+  },
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': abs('/how-it-works/'),
+  name: 'How VibeXP works',
+  url: abs('/how-it-works/'),
+  isPartOf: { '@type': 'WebSite', '@id': `${SITE}${url('/')}#website`, name: SITE_NAME },
+  about: { '@id': `${SITE}${url('/')}#app` },
+};
+---
+
+<Page
+  title="How VibeXP works - one shared brain for your team's AI"
+  description="Your prompts, rules and memory in one place every AI tool reads before a task and writes back to after. See the loop, the MCP connection, and how solo users, teams and agents use it."
+  current="how"
+>
+  <JsonLd slot="head" schema={schema} />
+
+  <div class="shell">
+    <section class="hero hero--sub">
+      <div class="hero__eyebrow">
+        <span class="pill">How it works</span>
+        <span class="pill pill--plain">Solo, then team</span>
+      </div>
+      <h1 class="hero__title">Give your team's AI <em>one</em> shared brain.</h1>
+      <p class="hero__lede">
+        Your prompts, project context and rules usually live on one laptop, in one tool, in one
+        person's head. VibeXP gives them one home that <b>every AI tool plugs into</b>. Claude Code,
+        Cursor, ChatGPT and your agents all read from it and write back to it, so your AI never
+        starts from scratch.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href={url('/#install')}>Run VibeXP &#8594;</a>
+        <a class="btn" href={url('/docs/user-guide/intro/')}>Read the docs</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <h2>Where your knowledge lives.</h2>
+        <span class="label">Building blocks</span>
+      </div>
+      <div class="grid2 blocks">
+        {BLOCKS.map((f) => (
+          <a class="sheet card block" href={url(`/features/${f.slug}/`)}>
+            <span class="badge">{f.name}</span>
+            <h4>{f.eyebrow}</h4>
+            <p>{f.summary}</p>
+            <span class="block__go">Learn more &#8594;</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section" id="loop">
+      <div class="section__head">
+        <h2>It does not just use your knowledge. It builds it.</h2>
+        <span class="label">The loop</span>
+      </div>
+      <div class="loop">
+        <div class="sheet card">
+          <span class="badge">1 &middot; Read</span>
+          <h4>Before a task</h4>
+          <p>
+            Your AI reads the relevant prompts, rules, memory and past work first, so it starts with
+            everything already learned.
+          </p>
+        </div>
+        <div class="sheet card">
+          <span class="badge">2 &middot; Work</span>
+          <h4>As it works</h4>
+          <p>It logs new lessons, updates memory, and saves what it produced back into VibeXP.</p>
+        </div>
+        <div class="sheet card">
+          <span class="badge">3 &middot; Write back</span>
+          <h4>Every session after</h4>
+          <p>
+            That richer context is waiting, for you and every teammate. Most AI tools forget
+            everything when the session ends; here, every session makes the next one better.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="connect">
+      <div class="section__head">
+        <h2>Connect in three steps.</h2>
+        <span class="label">Over MCP</span>
+      </div>
+      <div class="sheet panel">
+        <div class="eyebrow">
+          No API key to copy
+          <span class="eyebrow__end"><a href={url('/docs/user-guide/mcp-server/')}>Per-client setup &#8599;</a></span>
+        </div>
+        <ol class="osteps steps">
+          <li>
+            <b>Run your instance.</b> <code>docker compose up -d</code> in a clone of the repository
+            serves the app, the API and the MCP endpoint on one port.
+          </li>
+          <li>
+            <b>Add the endpoint to your AI tool.</b> The same URL works in Claude Code, Cursor, VS Code,
+            Gemini CLI and Codex. In Claude Code it is one line:
+            <CopyLine code={'claude mcp add --transport http vibexp http://localhost:8080/mcp/v1/common'} />
+          </li>
+          <li>
+            <b>Sign in and approve.</b> Your tool opens the browser to a consent screen. Approve it once
+            and your AI can read and write your prompts, rules, memory, artifacts and feeds.
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" id="uses">
+      <div class="section__head">
+        <h2>How people use it.</h2>
+        <span class="label">Four ways</span>
+      </div>
+      <div class="grid2">
+        {USES.map((u) => (
+          <div class="sheet way">
+            <span class="way__tag">{u.tag}</span>
+            <h3>{u.h}</h3>
+            <p>{u.p}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <StarCta />
+
+    <section class="closer">
+      <h2>Give your team's AI a memory that compounds.</h2>
+      <p>
+        Stop rebuilding context in every tool and every teammate's head. Put your prompts, rules and
+        knowledge in one place, and let every session make the next one smarter.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href={url('/#install')}>Run VibeXP &#8594;</a>
+        <a class="btn btn--ghost" href={url('/docs/')}>Read the docs</a>
+      </div>
+    </section>
+  </div>
+</Page>

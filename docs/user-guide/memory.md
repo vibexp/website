@@ -1,0 +1,453 @@
+# Memory
+
+Your personal AI knowledge vault that remembers everything important about your projects, preferences, and workflows. Never explain the same thing twice.
+
+## Overview
+
+Memory Management is an intelligent context persistence system that stores, organizes, and retrieves important information across all your AI interactions. Think of it as your AI's long-term memory.
+
+### Key Benefits
+
+- **Never Repeat Yourself**: Store context once, use everywhere
+- **Instant Recall**: Find any memory in milliseconds
+- **Auto-Context**: AI automatically references relevant memories
+- **Rich Metadata**: Tags, categories, and custom fields
+- **Cross-Platform**: Web, API, and MCP access
+
+## What Are Memories?
+
+Memories are text-based information snippets that provide context to AI conversations:
+
+- Project specifications
+- Coding standards and conventions
+- Personal preferences and style guides
+- Workflow procedures
+- Important facts and decisions
+- Team guidelines
+- Technical constraints
+
+## Creating Memories
+
+### Manual Creation
+
+1. Navigate to **Memory** in the sidebar
+2. Click **Create New Memory**
+3. Enter memory details:
+   - **Text**: The memory content
+   - **Project**: Organization grouping (optional)
+   - **Metadata**: Tags, category, priority, custom fields
+4. Click **Save**
+
+### Example Memory
+
+```
+Project: vibexp-backend
+Category: coding-standards
+Priority: high
+
+TypeScript Style Guide:
+- Use functional components with hooks
+- Prefer const over let
+- Use async/await over promises
+- Follow Airbnb ESLint rules
+- Document complex functions with JSDoc
+```
+
+### Automatic Creation via MCP
+
+Connected AI tools can create memories during conversations:
+
+```typescript
+vibexp_io_create_memory({
+  team_id: "<team-uuid-or-slug>",
+  project_id: "<project-uuid>",
+  text: "User prefers React with TypeScript and Tailwind CSS",
+  metadata: {
+    category: "coding_preferences",
+    priority: "medium"
+  }
+})
+```
+
+## Organizing Memories
+
+### Project Grouping
+
+Organize memories by project:
+
+```
+user/preferences
+company/main-app
+personal/workflows
+client/project-x
+```
+
+### Metadata Organization
+
+#### Categories
+
+Organize by category:
+- `coding_standards`
+- `project_specs`
+- `workflow_procedures`
+- `personal_preferences`
+- `team_guidelines`
+
+#### Priorities
+
+Set importance levels:
+- `high`: Critical context always referenced
+- `medium`: Important but context-dependent
+- `low`: Nice-to-have background information
+
+#### Custom Tags
+
+Add searchable tags:
+- Technology: `typescript`, `react`, `nodejs`
+- Domain: `frontend`, `backend`, `devops`
+- Purpose: `style-guide`, `architecture`, `deployment`
+
+### Linking Memories to What They Explain
+
+Tags group memories; relations connect them to specific resources. A memory that
+records why a decision was made can be attached to that resource, which is then
+`explained-by` the memory, so the reasoning surfaces next to the thing it
+justifies rather than only in search. See [Relations](relations.md).
+
+## Memory Lifecycle Status
+
+Every memory has a lifecycle **status** that controls where it appears:
+
+- **active** — the default. Active memories show up in memory lists and in search results.
+- **draft** — a work in progress. Drafts appear in default memory lists so you can keep refining them, but they are **never returned by search**, so AI tools won't pick them up as context.
+- **archived** — retired. Archived memories are hidden from default lists and from search, but remain reachable when you filter the list by the `archived` status explicitly.
+
+### Changing a Memory's Status
+
+- **In the app** — the memory create/edit form includes a status selector, each memory shows a status badge in the list and detail views, and the memory list has a status filter (including "All statuses") so you can find drafts and archived memories.
+- **Over MCP** — `vibexp_io_create_memory` and `vibexp_io_update_memory` both accept a `status` parameter (`active`, `draft`, or `archived`), so connected AI tools can, for example, park an unconfirmed fact as a draft or archive an outdated one.
+
+:::tip
+Prefer archiving over deleting: an archived memory stops influencing search and AI context but stays available if you need it back.
+:::
+
+## Searching and Filtering
+
+### Semantic Search
+
+Search finds memories **by meaning**, not just by matching words:
+
+```
+Search: "React hooks best practices"
+```
+
+Surfaces memories about React hooks and best practices even when they use different wording. Semantic search is the default.
+
+:::note[Keyword fallback]
+Semantic search requires the deployment to have an embedding provider configured. When it doesn't, VibeXP automatically falls back to keyword full-text search — same search box, exact-word matching instead of matching by meaning.
+:::
+
+#### Keyword search syntax
+
+In keyword mode (no embedding provider) the search box supports these operators:
+
+- `"exact phrase"`: words in quotes must appear together, in order.
+- `word1 OR word2`: match either term (plain words are ANDed by default).
+- `term -excluded`: exclude results containing a term.
+
+Title matches rank highest, and ranking is length-normalized so a short,
+on-topic title beats a long document that merely mentions the term. A single
+mistyped word still matches by typo tolerance.
+
+In **semantic mode** (embedding provider configured) the query is embedded as
+text, so these operators are treated as ordinary words rather than search
+operators.
+
+### Advanced Filters
+
+Filter memories by:
+- **Tag**: Custom tag filtering (tags come from memory metadata)
+- **Status**: Memory lifecycle status
+- **Metadata**: The metadata filter matches on any metadata key-value pairs.
+  Pick a key, then one or more values (with typeahead from the values your
+  team actually uses). Keys combine with AND, values within a key with OR.
+  Tag filtering is the same mechanism applied to `metadata.tags`, and all of
+  it is applied server-side
+- **Project**: Use the global project selector in the app header to scope the
+  list to one project (or all)
+
+Fields like category and priority live in each memory's free-form metadata
+and are searchable.
+
+The memory create and edit form includes a key-value metadata editor for adding or changing metadata pairs directly in the UI.
+
+To query memories by the metadata they carry, see [Metadata filtering](metadata-filtering.md).
+
+## Auto-Context Injection
+
+### How It Works
+
+When using AI tools connected via MCP:
+
+1. You start a conversation
+2. AI analyzes the context and topic
+3. Relevant memories are automatically searched
+4. Matching memories are injected as context
+5. AI uses this context in responses
+
+### Relevance Matching
+
+Memories are ranked by **semantic relevance** to the query (vector
+similarity). When recency ranking is enabled, relevance is blended with how
+recently a memory was created or updated. Ranking is configurable **per
+team** on the team's Search Settings page (presets or advanced tuning of the
+relevance/created/updated weights and half-life), falling back to the
+instance defaults. Without an embedding provider, matching falls back to
+keyword (full-text) search with typo tolerance.
+
+### Manual Reference
+
+You can also manually reference memories:
+
+```
+"Using the coding standards from memory..."
+"Apply the deployment procedure we discussed..."
+```
+
+Connected AI tools can search and retrieve specific memories on demand.
+
+## Updating Memories
+
+### Edit Existing
+
+1. Find the memory
+2. Click **Edit**
+3. Update text or metadata
+4. Save changes
+
+### Version History
+
+Every save snapshots the memory's content as a **version**. The memory view
+keeps the full version history: browse earlier snapshots, diff them against
+the current text, and restore an older version when a change went wrong.
+The instance keeps the 20 most recent versions per memory by default
+(`retention.content_version_limit`).
+
+## MCP Integration
+
+### Creating Memories
+
+```javascript
+// AI tools create memories during conversations
+vibexp_io_create_memory({
+  team_id: "<team-uuid-or-slug>",
+  project_id: "<project-uuid>",
+  text: "User's testing framework preference: Jest with React Testing Library",
+  status: "active", // optional: active (default), draft, or archived
+  metadata: {
+    category: "testing",
+    priority: "medium",
+    tags: ["jest", "react", "testing"]
+  }
+})
+```
+
+### Listing Memories
+
+```javascript
+// AI tools list memories for context with the generic list_resources tool
+vibexp_io_list_resources({
+  team_id: "<team-uuid-or-slug>",
+  resource_type: "memory",
+  project_id: "<project-uuid>",
+  search: "database",
+  limit: 5
+})
+```
+
+### Retrieving Specific Memory
+
+```javascript
+// Get a memory's full content by ID with the generic get_resource tool
+vibexp_io_get_resource({
+  team_id: "<team-uuid-or-slug>",
+  resource_type: "memory",
+  id: "<memory-uuid>"
+})
+```
+
+### Updating Memories
+
+```javascript
+// Update memory content, status, or metadata
+vibexp_io_update_memory({
+  team_id: "<team-uuid-or-slug>",
+  memory_id: "<memory-uuid>",
+  text: "Updated content...",
+  status: "archived", // optional lifecycle change
+  metadata: {
+    priority: "high"
+  }
+})
+```
+
+### Deleting Memories
+
+AI tools delete a memory with the generic `vibexp_io_delete_resource` tool, passing `resource_type: "memory"` and the memory's `id`:
+
+```javascript
+vibexp_io_delete_resource({
+  team_id: "<team-uuid-or-slug>",
+  resource_type: "memory",
+  id: "<memory-uuid>"
+})
+```
+
+Deletion also removes the memory's search embeddings. Prefer archiving (`status: "archived"`) when you might want the memory back.
+
+## Common Use Cases
+
+### Coding Preferences
+
+```
+Category: coding_preferences
+Priority: high
+
+TypeScript Preferences:
+- Strict mode enabled
+- Functional components only
+- Use Zod for validation
+- Prefer composition over inheritance
+```
+
+### Project Context
+
+```
+Project: client/ecommerce-app
+Category: project_specs
+
+Architecture:
+- Next.js 14 with App Router
+- PostgreSQL database
+- Prisma ORM
+- Tailwind CSS for styling
+- Deployed on Vercel
+```
+
+### Workflow Procedures
+
+```
+Category: workflows
+Priority: medium
+
+Git Workflow:
+1. Create feature branch from main
+2. Make changes with conventional commits
+3. Run tests locally
+4. Push and create PR
+5. Wait for CI and review
+6. Squash merge to main
+```
+
+### Team Guidelines
+
+```
+Project: company/main-app
+Category: team_guidelines
+Priority: high
+
+Code Review Guidelines:
+- All PRs require 2 approvals
+- Must pass all CI checks
+- Update documentation for new features
+- Add tests for bug fixes
+```
+
+## Tips and Best Practices
+
+### Memory Content
+
+- Be specific and concise
+- Include relevant context
+- Use clear, searchable language
+- Update regularly as preferences change
+
+### Metadata Strategy
+
+- Use consistent categories across memories
+- Assign appropriate priorities
+- Add multiple relevant tags
+- Include project context when applicable
+
+### Organization
+
+- Group related memories by project
+- Use hierarchical projects for large organizations
+- Regular cleanup of outdated memories
+- Archive old memories instead of deleting
+
+### Search Optimization
+
+- Include keywords in memory text
+- Use tags for common search terms
+- Add context in metadata
+- Keep memory text focused
+
+## API Access
+
+### REST API Endpoints
+
+All memory endpoints are team-scoped:
+
+```bash
+# List memories (optional filters: project_id, search, status, ...)
+GET /api/v1/{team_id}/memories?project_id={project_id}
+
+# Get specific memory
+GET /api/v1/{team_id}/memories/{memory_id}
+
+# Create memory
+POST /api/v1/{team_id}/memories
+
+# Update memory
+PUT /api/v1/{team_id}/memories/{memory_id}
+
+# Delete memory
+DELETE /api/v1/{team_id}/memories/{memory_id}
+```
+
+See [API Keys](integrations/api-keys.md) for authentication.
+
+## Frequently Asked Questions
+
+### How many memories can I store?
+
+Unlimited. Create as many memories as needed for your context library.
+
+### How does auto-context work?
+
+When AI tools are connected via MCP, they automatically search your memories for relevant context based on conversation topics and keywords.
+
+### Can I control which memories are used?
+
+Yes. Use priority levels and project grouping to control which memories are most likely to be referenced.
+
+### Are memories shared between projects?
+
+Memories can be project-specific or global. Project-specific memories are only referenced in that project context.
+
+### Can I export memories?
+
+There is no built-in export button. Use the REST API
+(`GET /api/v1/{team_id}/memories`) to list your memories as JSON, or connected
+AI tools via MCP to retrieve them.
+
+### How secure are my memories?
+
+All memories are encrypted at rest and in transit. Access is controlled via API keys with user-specific isolation.
+
+## Related Features
+
+- [MCP Server Integration](mcp-server.md) - Auto-inject memories in AI conversations
+- [Artifacts](artifacts.md) - Store larger content pieces
+- [Prompts](prompts/README.md) - Reusable AI templates

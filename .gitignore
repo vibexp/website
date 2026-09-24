@@ -1,39 +1,10 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# Generated from docs/ by scripts/sync-docs.mjs — never edit, never commit.
+src/content/docs/docs/
 
-node_modules
-dist
-dist-ssr
-*.local
+# Resolved from the GitHub Releases API by scripts/fetch-release.mjs.
+src/data/release.json
+src/data/repo.json
 
-# Environment files (may contain secrets, e.g. SENTRY_AUTH_TOKEN)
-.env
-.env.*
-!.env.example
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Playwright test results
-test-results/
-playwright-report/
-coverage/
-.playwright-mcp/
-
-# Astro (issue #1907 additive build)
-dist-astro
-.astro
+dist/
+.astro/
+node_modules/
