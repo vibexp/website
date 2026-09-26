@@ -73,7 +73,7 @@ curl -X GET \
 
 **Query parameters:**
 - `status` - Filter by status (`draft` or `published`)
-- `labels` - Comma-separated list of labels to filter by. A prompt matches when it carries **any** of them (before v0.13.0 it had to carry all of them). At most 25 labels, each at most 50 characters; see [Labels](../labels.md#filtering-by-label)
+- `labels` - Comma-separated list of labels to filter by. A prompt matches when it carries **any** of them (OR); before v0.13.0 it had to carry all of them, see [Upgrading](../self-hosting/upgrading.md#prompt-label-filter-now-matches-any-label-v0130). Each label is trimmed and empty entries are ignored. More than 25 labels, or a label longer than 50 characters, is rejected with `400`. See [Labels](../labels.md#filtering-by-label)
 - `search` - Search in title, description, or content
 - `project_id` - Filter by project
 - `mcp_expose` - Filter by MCP exposure flag (`true`/`false`)

@@ -36,6 +36,30 @@ in between.
 
 ## Breaking changes
 
+### Prompt label filter now matches any label (v0.13.0)
+
+v0.13.0 changes what `?labels=` means on the prompt list endpoint,
+`GET /api/v1/{team_id}/prompts`, so that it behaves the same as on artifacts,
+blueprints and memories. Nothing in the database changes; only the answers to
+requests that already worked do.
+
+- **Any, not all.** `?labels=a,b` used to return only prompts carrying **both**
+  `a` and `b`. It now returns prompts carrying **at least one** of them, so
+  adding a label to the filter widens the result instead of narrowing it.
+- **New `400` responses.** A filter naming more than **25** labels, or a label
+  longer than **50** characters, used to be passed to the database as it was.
+  It is now rejected with `400`.
+- **Empty entries are ignored.** `?labels=a,,b` and `?labels=a,` used to match
+  no prompt at all, because no prompt carries an empty label. They now filter on
+  `a` and `b`, and on `a`. Each entry is also trimmed, so `?labels=a, b` now
+  filters on `b` rather than on ` b`.
+
+If a script relied on the old all-of behaviour, filter on one label and check
+the rest on the client (every prompt in the response carries its `labels`), or
+send the request once per label and intersect the results. See
+[Labels](../labels.md#filtering-by-label) for how the filter works on every
+resource type.
+
 ### Memory `metadata.tags` moved into `labels` (v0.13.0)
 
 v0.13.0 gives every resource type one taxonomy. Its database migration, `016`,
@@ -93,11 +117,8 @@ in **Labels**. Anything typed into the Tags card is folded into `labels` on save
 after the labels already set, so existing labels are never lost; tags beyond the
 10-label cap are dropped without an error.
 
-The same release changes the prompt list filter. `?labels=a,b` on prompts used
-to return prompts carrying **every** listed label; it now returns prompts
-carrying **at least one**, which is what the filter means on artifacts,
-blueprints and memories too. See [Labels](../labels.md) for labels on every
-resource type.
+The same release changes the prompt list filter: see
+[Prompt label filter now matches any label](#prompt-label-filter-now-matches-any-label-v0130).
 
 ### Bundled Postgres upgraded from 16 to 17 (v0.10.0)
 
