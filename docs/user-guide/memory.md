@@ -11,7 +11,7 @@ Memory Management is an intelligent context persistence system that stores, orga
 - **Never Repeat Yourself**: Store context once, use everywhere
 - **Instant Recall**: Find any memory in milliseconds
 - **Auto-Context**: AI automatically references relevant memories
-- **Rich Metadata**: Tags, categories, and custom fields
+- **Rich Metadata**: Labels, categories, and custom fields
 - **Cross-Platform**: Web, API, and MCP access
 
 ## What Are Memories?
@@ -35,7 +35,8 @@ Memories are text-based information snippets that provide context to AI conversa
 3. Enter memory details:
    - **Text**: The memory content
    - **Project**: Organization grouping (optional)
-   - **Metadata**: Tags, category, priority, custom fields
+   - **Labels**: Free-form words to group and filter by (up to 10)
+   - **Metadata**: Category, priority, custom fields
 4. Click **Save**
 
 ### Example Memory
@@ -100,16 +101,20 @@ Set importance levels:
 - `medium`: Important but context-dependent
 - `low`: Nice-to-have background information
 
-#### Custom Tags
+#### Labels
 
-Add searchable tags:
+Group memories with labels, up to 10 per memory:
 - Technology: `typescript`, `react`, `nodejs`
 - Domain: `frontend`, `backend`, `devops`
 - Purpose: `style-guide`, `architecture`, `deployment`
 
+Labels used to be kept as tags in `metadata.tags`; since v0.13.0 they are a
+field of their own, shared with prompts, artifacts and blueprints. See
+[Labels](labels.md).
+
 ### Linking Memories to What They Explain
 
-Tags group memories; relations connect them to specific resources. A memory that
+Labels group memories; relations connect them to specific resources. A memory that
 records why a decision was made can be attached to that resource, which is then
 `explained-by` the memory, so the reasoning surfaces next to the thing it
 justifies rather than only in search. See [Relations](relations.md).
@@ -166,13 +171,13 @@ operators.
 ### Advanced Filters
 
 Filter memories by:
-- **Tag**: Custom tag filtering (tags come from memory metadata)
+- **Labels**: Over the REST API, `?labels=` returns memories carrying any of
+  the listed labels (see [Labels](labels.md#filtering-by-label))
 - **Status**: Memory lifecycle status
 - **Metadata**: The metadata filter matches on any metadata key-value pairs.
   Pick a key, then one or more values (with typeahead from the values your
-  team actually uses). Keys combine with AND, values within a key with OR.
-  Tag filtering is the same mechanism applied to `metadata.tags`, and all of
-  it is applied server-side
+  team actually uses). Keys combine with AND, values within a key with OR,
+  and all of it is applied server-side
 - **Project**: Use the global project selector in the app header to scope the
   list to one project (or all)
 
@@ -244,10 +249,10 @@ vibexp_io_create_memory({
   project_id: "<project-uuid>",
   text: "User's testing framework preference: Jest with React Testing Library",
   status: "active", // optional: active (default), draft, or archived
+  labels: ["jest", "react", "testing"],
   metadata: {
     category: "testing",
-    priority: "medium",
-    tags: ["jest", "react", "testing"]
+    priority: "medium"
   }
 })
 ```

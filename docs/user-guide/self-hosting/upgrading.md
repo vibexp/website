@@ -36,6 +36,61 @@ in between.
 
 ## Breaking changes
 
+### Memory `metadata.tags` moved into `labels` (v0.13.0)
+
+v0.13.0 gives every resource type one taxonomy. Its database migration, `016`,
+adds a `labels text[] NOT NULL DEFAULT '{}'` column with a GIN index to
+`artifacts`, `blueprints` and `memories` (prompts already had one), and then
+**moves each memory's `metadata.tags` into `labels` and removes the `tags` key
+from `metadata`**. That is a rewrite of existing rows, not only a new column, so
+it is worth knowing what it does before you upgrade.
+
+:::caution[A long tag list is narrowed, not preserved]
+The backfill normalises tags exactly as the API normalises labels on every
+write. Each tag is trimmed, empty ones are dropped, duplicates collapse to the
+first occurrence, each tag is truncated to **50 characters**, and a memory keeps
+at most its first **10** tags. A memory that had 15 tags ends up with 10
+labels, and the other 5 are gone from it. If that matters to you, take a backup,
+or export the affected memories' `metadata.tags` first:
+
+```sql
+SELECT id, metadata->'tags' FROM memories
+ WHERE jsonb_typeof(metadata->'tags') = 'array'
+   AND jsonb_array_length(metadata->'tags') > 10;
+```
+:::
+
+The rest of the migration:
+
+- **Only an array is moved.** A `tags` value that is not a JSON array (a string,
+  a number, an object) is ordinary metadata that happens to share the name: the
+  migration leaves it in `metadata` untouched.
+- **Nothing looks freshly edited.** The trigger that bumps `updated_at` is
+  suspended for the backfill, so migrated memories keep their timestamps, and
+  search recency ranking and freshness still reflect real edits.
+- **Whitespace.** The backfill trims ASCII whitespace. A tag carrying a
+  non-ASCII space (a non-breaking space, say) keeps it until the memory's next
+  write, which trims it.
+- **Old clients keep working.** A client that still sends
+  `metadata: {"tags": [...]}` on a memory has those tags folded into `labels` by
+  the server, so nothing puts the key back.
+- **Rolling back** (running 016's down migration) writes each memory's `labels`
+  back to `metadata.tags`, except where `metadata` already holds a non-array
+  `tags` value: that value is kept, and that memory's labels are lost with the
+  dropped column.
+
+After the upgrade, the memory edit form still shows a **Tags** card next to the
+new **Labels** input, and the memory list a **Tags** column. Both read
+`metadata.tags`, so they are empty for every migrated memory: your tags are in
+**Labels**. Anything typed into the Tags card is folded into `labels` on save,
+so it is confusing rather than lossy.
+
+The same release changes the prompt list filter. `?labels=a,b` on prompts used
+to return prompts carrying **every** listed label; it now returns prompts
+carrying **at least one**, which is what the filter means on artifacts,
+blueprints and memories too. See [Labels](../labels.md) for labels on every
+resource type.
+
 ### Bundled Postgres upgraded from 16 to 17 (v0.10.0)
 
 The Postgres image shipped in the combined-image `docker-compose.yml` moved from
