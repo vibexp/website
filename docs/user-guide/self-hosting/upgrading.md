@@ -46,12 +46,13 @@ from `metadata`**. That is a rewrite of existing rows, not only a new column, so
 it is worth knowing what it does before you upgrade.
 
 :::caution[A long tag list is narrowed, not preserved]
-The backfill normalises tags exactly as the API normalises labels on every
-write. Each tag is trimmed, empty ones are dropped, duplicates collapse to the
-first occurrence, each tag is truncated to **50 characters**, and a memory keeps
-at most its first **10** tags. A memory that had 15 distinct tags ends up with
-10 labels, and the other 5 are gone from it. If that matters to you, take a
-backup, or export every memory's `metadata.tags` first:
+The backfill normalises tags the way the server still normalises `metadata.tags`
+sent by an old client (explicit `labels` over the limits are rejected instead).
+Each tag is trimmed, empty ones are dropped, duplicates collapse to the first
+occurrence, each tag is truncated to **50 characters**, and a memory keeps at
+most its first **10** tags. A memory that had 15 distinct tags ends up with 10
+labels, and the other 5 are gone from it. If that matters to you, take a backup,
+or export every memory's `metadata.tags` first:
 
 ```sql
 SELECT id, metadata->'tags' FROM memories
