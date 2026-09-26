@@ -87,8 +87,9 @@ The rest of the migration:
 After the upgrade, the memory create and edit forms still show a **Tags** card
 next to the new **Labels** input, and the memory list a **Tags** column. Both
 read `metadata.tags`, so they are empty for every migrated memory: your tags are
-in **Labels**. Anything typed into the Tags card is folded into `labels` on save
-(within the 10-label cap), so it is confusing rather than lossy.
+in **Labels**. Anything typed into the Tags card is folded into `labels` on save,
+after the labels already set, so existing labels are never lost; tags beyond the
+10-label cap are dropped without an error.
 
 The same release changes the prompt list filter. `?labels=a,b` on prompts used
 to return prompts carrying **every** listed label; it now returns prompts
