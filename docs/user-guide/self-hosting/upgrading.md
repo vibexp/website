@@ -49,14 +49,13 @@ it is worth knowing what it does before you upgrade.
 The backfill normalises tags exactly as the API normalises labels on every
 write. Each tag is trimmed, empty ones are dropped, duplicates collapse to the
 first occurrence, each tag is truncated to **50 characters**, and a memory keeps
-at most its first **10** tags. A memory that had 15 tags ends up with 10
-labels, and the other 5 are gone from it. If that matters to you, take a backup,
-or export the affected memories' `metadata.tags` first:
+at most its first **10** tags. A memory that had 15 distinct tags ends up with
+10 labels, and the other 5 are gone from it. If that matters to you, take a
+backup, or export every memory's `metadata.tags` first:
 
 ```sql
 SELECT id, metadata->'tags' FROM memories
- WHERE jsonb_typeof(metadata->'tags') = 'array'
-   AND jsonb_array_length(metadata->'tags') > 10;
+ WHERE jsonb_typeof(metadata->'tags') = 'array';
 ```
 :::
 
@@ -71,15 +70,21 @@ The rest of the migration:
 - **Whitespace.** The backfill trims ASCII whitespace. A tag carrying a
   non-ASCII space (a non-breaking space, say) keeps it until the memory's next
   write, which trims it.
-- **Old clients keep working.** A client that still sends
+- **Old clients keep working, with one catch.** A client that still sends
   `metadata: {"tags": [...]}` on a memory has those tags folded into `labels` by
-  the server, so nothing puts the key back.
+  the server (normalised and capped the same way, never rejected), so nothing
+  puts the key back. But on an **update**, `metadata.tags` sent without
+  `labels` **replaces** the memory's labels with those tags, dropping any label
+  added since. Move such scripts over to `labels`.
 - **Rolling back** (running 016's down migration) writes each memory's `labels`
   back to `metadata.tags`, except where `metadata` already holds a non-array
   `tags` value: that value is kept, and that memory's labels are lost with the
-  dropped column.
+  dropped column. The same down migration also drops the `labels` column on
+  artifacts and blueprints, whose labels are not saved anywhere, and the memory
+  `title` column that v0.13.0 added alongside it, so every memory title goes
+  too.
 
-After the upgrade, the memory edit form still shows a **Tags** card next to the
+After the upgrade, the memory create and edit forms still show a **Tags** card next to the
 new **Labels** input, and the memory list a **Tags** column. Both read
 `metadata.tags`, so they are empty for every migrated memory: your tags are in
 **Labels**. Anything typed into the Tags card is folded into `labels` on save,

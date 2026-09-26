@@ -150,7 +150,7 @@ curl -X POST \
   "content": "string (required)",
   "status": "draft | published (optional, default: draft)",
   "available_in_mcp": "boolean (optional, default: false)",
-  "labels": ["array of strings (optional, max 10)"],
+  "labels": ["array of strings (optional; the web app allows up to 10, the API does not check)"],
   "slug": "string (optional, auto-generated if not provided)"
 }
 ```
@@ -243,8 +243,7 @@ The API uses standard HTTP status codes:
   "error": "validation_error",
   "message": "Invalid request data",
   "details": {
-    "title": "Title is required",
-    "labels": "Maximum 10 labels allowed"
+    "title": "Title is required"
   }
 }
 ```
