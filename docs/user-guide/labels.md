@@ -18,7 +18,10 @@ into `labels` by that release's migration: see
 | Labels per resource | 10 |
 | Label length | 50 characters |
 
-A create or update request over either limit is rejected with `400`.
+On artifacts, blueprints and memories, a create or update request over either
+limit is rejected with `400`, over the REST API and over MCP alike. Prompt
+labels are not checked against these limits by the server in this release (the
+web app's prompt form still stops at 10).
 
 On artifacts, blueprints and memories, labels are normalised on every write:
 each one is trimmed, empty ones are dropped, and duplicates collapse to the
@@ -80,7 +83,7 @@ response on its side.
 ## Over MCP
 
 The create and update tools for all four resource types take an optional
-`labels` argument with the same limits:
+`labels` argument, with the same limits as the REST API:
 
 - `vibexp_io_create_prompt` / `vibexp_io_update_prompt`
 - `vibexp_io_create_artifact` / `vibexp_io_update_artifact`

@@ -381,7 +381,7 @@ Code Review Guidelines:
 
 - Use consistent categories across memories
 - Assign appropriate priorities
-- Add multiple relevant tags
+- Add a few relevant labels
 - Include project context when applicable
 
 ### Organization
@@ -394,7 +394,7 @@ Code Review Guidelines:
 ### Search Optimization
 
 - Include keywords in memory text
-- Use tags for common search terms
+- Use labels for the groups you filter by
 - Add context in metadata
 - Keep memory text focused
 

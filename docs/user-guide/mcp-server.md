@@ -266,7 +266,7 @@ Read blueprints with the generic `vibexp_io_get_resource` / `vibexp_io_list_reso
 
 Read memories with the generic `vibexp_io_get_resource` / `vibexp_io_list_resources` tools (`resource_type: memory`).
 
-Every create and update tool above, for prompts, artifacts, blueprints, and memories, takes an optional `labels` argument: up to 10 labels of at most 50 characters each. On an update tool, omitting `labels` leaves them unchanged and an empty list clears them. See [Labels](labels.md).
+Every create and update tool above, for prompts, artifacts, blueprints, and memories, takes an optional `labels` argument. On artifacts, blueprints, and memories it is capped at 10 labels of at most 50 characters each. On an update tool, omitting `labels` leaves them unchanged and an empty list clears them. See [Labels](labels.md).
 
 ### Feeds
 
