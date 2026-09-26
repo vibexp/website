@@ -73,7 +73,7 @@ curl -X GET \
 
 **Query parameters:**
 - `status` - Filter by status (`draft` or `published`)
-- `labels` - Comma-separated list of labels to filter by
+- `labels` - Comma-separated list of labels to filter by. A prompt matches when it carries **any** of them (before v0.13.0 it had to carry all of them). At most 25 labels, each at most 50 characters; see [Labels](../labels.md#filtering-by-label)
 - `search` - Search in title, description, or content
 - `project_id` - Filter by project
 - `mcp_expose` - Filter by MCP exposure flag (`true`/`false`)
@@ -150,7 +150,7 @@ curl -X POST \
   "content": "string (required)",
   "status": "draft | published (optional, default: draft)",
   "available_in_mcp": "boolean (optional, default: false)",
-  "labels": ["array of strings (optional, max 10)"],
+  "labels": ["array of strings (optional; the web app allows up to 10, the API does not check)"],
   "slug": "string (optional, auto-generated if not provided)"
 }
 ```
@@ -243,8 +243,7 @@ The API uses standard HTTP status codes:
   "error": "validation_error",
   "message": "Invalid request data",
   "details": {
-    "title": "Title is required",
-    "labels": "Maximum 10 labels allowed"
+    "title": "Title is required"
   }
 }
 ```

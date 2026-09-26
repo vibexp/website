@@ -43,7 +43,7 @@ To edit, open a blueprint and choose **Edit**, make your changes, and save.
 
 The create and edit form includes a key-value metadata editor for adding or changing metadata pairs directly in the UI.
 
-To query blueprints by the metadata they carry, see [Metadata filtering](metadata-filtering.md).
+To query blueprints by the metadata they carry, see [Metadata filtering](metadata-filtering.md). Blueprints also carry up to 10 free-form [labels](labels.md), filterable over the REST API with `?labels=`.
 
 :::note
 A blueprint's slug is unique **per project**. Two projects can each have a blueprint with the same slug.

@@ -124,6 +124,8 @@ Filter by:
 - **Metadata**: Match on any metadata key-value pairs. Pick a key, then one
   or more values (with typeahead from the values your team actually uses).
   Keys combine with AND, values within a key with OR
+- **Labels**: Over the REST API, `?labels=` returns artifacts carrying any of
+  the listed labels (see [Labels](labels.md#filtering-by-label))
 
 ### Sort Options
 

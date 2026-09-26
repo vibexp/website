@@ -75,6 +75,8 @@ export const PAGES = [
     description: "Blueprints are the rules and guidelines that shape your AI's behavior, organized per tool, readable by your AI assistants over MCP." },
   { file: "user-guide/metadata-filtering.md", slug: "user-guide/metadata-filtering", label: "Metadata filtering", group: "user",
     description: "Filter artifacts, memories, and blueprints by the metadata your team actually stores, using one JSON query parameter with AND across keys and OR within a key, plus catalog endpoints and MCP tools that let an AI agent discover which keys and values exist." },
+  { file: "user-guide/labels.md", slug: "user-guide/labels", label: "Labels", group: "user",
+    description: "Labels are the one taxonomy shared by prompts, artifacts, blueprints, and memories: free-form words on every resource, a comma-separated list filter that matches any listed label, and the same argument on every MCP create and update tool." },
   { file: "user-guide/relations.md", slug: "user-guide/relations", label: "Relations", group: "user",
     description: "Relations are typed, directional links between your prompts, blueprints, memories, and artifacts, building a shared knowledge graph your AI and your team can navigate." },
   { file: "user-guide/mcp-server.md", slug: "user-guide/mcp-server", label: "MCP Server Integration", group: "user",

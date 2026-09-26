@@ -164,9 +164,9 @@ export const FEATURES = [
         ],
         code: [
           [['vibexp_io_create_memory', 'k'], ['(']],
-          [['  content: '], ['"Postgres pool maxes out at 20 under load.', 's']],
-          [['            '], ['pool_max 50 fixed the timeouts."', 's'], [',']],
-          [['  metadata: { tags: ['], ['"postgres"', 's'], [', '], ['"perf"', 's'], ['] }']],
+          [['  text: '], ['"Postgres pool maxes out at 20 under load.', 's']],
+          [['         '], ['pool_max 50 fixed the timeouts."', 's'], [',']],
+          [['  labels: ['], ['"postgres"', 's'], [', '], ['"perf"', 's'], [']']],
           [[')']],
         ],
         more: { label: 'Memory over MCP', path: '/docs/user-guide/memory/#mcp-integration' },
