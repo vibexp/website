@@ -426,17 +426,19 @@ Schedules live in the `schedules` table (migration `012_schedules`) and their
 interval has a **1-hour floor**, enforced both in code and by a database check
 constraint.
 
-| Key | Default | Purpose |
-| --- | --- | --- |
-| `scheduler.enabled` | `true` | Turns the loop on. `false` means nothing is claimed or run. |
-| `scheduler.tick_interval` | `1m` | How often the loop looks for due schedules. A polling cadence, not a job cadence. |
-| `scheduler.job_timeout` | `10m` | Bounds a single job handler invocation. |
-| `scheduler.due_limit` | `100` | Caps how many due schedules one tick claims. |
+| Key | Default | Env var | Purpose |
+| --- | --- | --- | --- |
+| `scheduler.enabled` | `true` | `SCHEDULER_ENABLED` | Turns the loop on. `false` means nothing is claimed or run. |
+| `scheduler.tick_interval` | `1m` | `SCHEDULER_TICK_INTERVAL` | How often the loop looks for due schedules. A polling cadence, not a job cadence. |
+| `scheduler.job_timeout` | `10m` | `SCHEDULER_JOB_TIMEOUT` | Bounds a single job handler invocation. |
+| `scheduler.due_limit` | `100` | `SCHEDULER_DUE_LIMIT` | Caps how many due schedules one tick claims. |
 
 :::note
-These four keys have **no `${VAR}` wiring in the image's baked config**, so they
-cannot be set with an environment variable. Mount your own `config.yaml` to
-change them.
+The published image's baked config wires all four keys to these environment
+variables, so on `docker run` you can tune or disable the scheduler with `-e`
+alone, for example `-e SCHEDULER_ENABLED=false`. Mounting your own
+`config.yaml` remains the alternative; `config.example.yaml` sets the keys as
+literals, so a config file built from it ignores these variables.
 :::
 
 :::caution[No user-facing schedules yet]

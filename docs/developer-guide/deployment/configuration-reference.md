@@ -116,8 +116,9 @@ live in `config.yaml`; `config.example.yaml` documents every one.
 - **File attachments** — enable the GCS emulator service and the related `app`
   variables. See [Docker & Compose](docker.md).
 - **Scheduler**: the in-process loop for recurring work. On by default, but no
-  job types ship yet, and it has **no env var in the baked image config**, so
-  tuning `scheduler.*` means mounting your own `config.yaml`. See
+  job types ship yet. Set `SCHEDULER_ENABLED=false` to turn it off, and tune it
+  with `SCHEDULER_TICK_INTERVAL` / `SCHEDULER_JOB_TIMEOUT` /
+  `SCHEDULER_DUE_LIMIT`. See
   [Backend Configuration](../backend/configuration.md#scheduler).
 
 Every running instance serves its own API spec at `/openapi.yaml` and
