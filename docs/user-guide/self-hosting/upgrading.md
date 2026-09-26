@@ -84,11 +84,11 @@ The rest of the migration:
   `title` column that v0.13.0 added alongside it, so every memory title goes
   too.
 
-After the upgrade, the memory create and edit forms still show a **Tags** card next to the
-new **Labels** input, and the memory list a **Tags** column. Both read
-`metadata.tags`, so they are empty for every migrated memory: your tags are in
-**Labels**. Anything typed into the Tags card is folded into `labels` on save,
-so it is confusing rather than lossy.
+After the upgrade, the memory create and edit forms still show a **Tags** card
+next to the new **Labels** input, and the memory list a **Tags** column. Both
+read `metadata.tags`, so they are empty for every migrated memory: your tags are
+in **Labels**. Anything typed into the Tags card is folded into `labels` on save
+(within the 10-label cap), so it is confusing rather than lossy.
 
 The same release changes the prompt list filter. `?labels=a,b` on prompts used
 to return prompts carrying **every** listed label; it now returns prompts

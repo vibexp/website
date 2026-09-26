@@ -19,9 +19,9 @@ into `labels` by that release's migration: see
 | Label length | 50 characters |
 
 On artifacts, blueprints and memories, a create or update request over either
-limit is rejected with `400`, over the REST API and over MCP alike. Prompt
-labels are not checked against these limits by the server in this release (the
-web app's prompt form still stops at 10).
+limit is rejected: with `400` over the REST API, and with a tool error over
+MCP. Prompt labels are not checked against these limits by the server in this
+release (the web app's prompt form still stops at 10).
 
 On artifacts, blueprints and memories, labels are normalised on every write:
 each one is trimmed, empty ones are dropped, and duplicates collapse to the
