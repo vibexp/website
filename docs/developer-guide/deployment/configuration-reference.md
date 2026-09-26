@@ -115,11 +115,11 @@ live in `config.yaml`; `config.example.yaml` documents every one.
   in the app with encrypted API keys.
 - **File attachments** — enable the GCS emulator service and the related `app`
   variables. See [Docker & Compose](docker.md).
-- **Scheduler**: the in-process loop for recurring work. On by default, but no
-  job types ship yet. Set `SCHEDULER_ENABLED=false` to turn it off, and tune it
-  with `SCHEDULER_TICK_INTERVAL` / `SCHEDULER_JOB_TIMEOUT` /
-  `SCHEDULER_DUE_LIMIT`. See
-  [Backend Configuration](../backend/configuration.md#scheduler).
+- **Scheduler**: the in-process loop for recurring work; today it runs
+  freshness-rule evaluation. On by default. Set `SCHEDULER_ENABLED=false` to
+  turn it off (freshness evaluation stops with it), and tune it with
+  `SCHEDULER_TICK_INTERVAL` / `SCHEDULER_JOB_TIMEOUT` / `SCHEDULER_DUE_LIMIT`.
+  See [Backend Configuration](../backend/configuration.md#scheduler).
 
 Every running instance serves its own API spec at `/openapi.yaml` and
 `/openapi.json`.

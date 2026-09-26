@@ -418,9 +418,11 @@ does not matter. A job that panics, fails, or times out is logged and the
 schedule still advances; on shutdown the loop waits for the job in flight to
 return before exiting.
 
-Nothing has moved onto it yet, so the externally driven
-[internal job endpoints](#internal-jobs-pubsub-oidc) (`/internal/jobs/*`,
-retention and digests) still need their external scheduler.
+Today it runs one job type, freshness-rule evaluation (`freshness_evaluate`):
+every team with freshness rules gets a schedule that flags resources nobody has
+read for long enough. Retention and digests have not moved onto it, so the
+externally driven [internal job endpoints](#internal-jobs-pubsub-oidc)
+(`/internal/jobs/*`) still need their external scheduler.
 
 Schedules live in the `schedules` table (migration `012_schedules`) and their
 interval has a **1-hour floor**, enforced both in code and by a database check
@@ -436,15 +438,9 @@ constraint.
 :::note
 The published image's baked config wires all four keys to these environment
 variables, so on `docker run` you can tune or disable the scheduler with `-e`
-alone, for example `-e SCHEDULER_ENABLED=false`. Mounting your own
-`config.yaml` remains the alternative; `config.example.yaml` sets the keys as
-literals, so a config file built from it ignores these variables.
-:::
-
-:::caution[No user-facing schedules yet]
-As of v0.10.0 this is platform plumbing only. No job types are registered, no
-schedule rows are created, and there is no API, MCP tool, or UI for schedules.
-The engine runs and does nothing until a feature registers a handler.
+alone. `SCHEDULER_ENABLED=false` also stops freshness-rule evaluation. Mounting
+your own `config.yaml` remains the alternative; `config.example.yaml` sets the
+keys as literals, so a config file built from it ignores these variables.
 :::
 
 ## Deployment environment detection
