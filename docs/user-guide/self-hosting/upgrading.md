@@ -68,8 +68,9 @@ The rest of the migration:
   suspended for the backfill, so migrated memories keep their timestamps, and
   search recency ranking and freshness still reflect real edits.
 - **Whitespace.** The backfill trims ASCII whitespace. A tag carrying a
-  non-ASCII space (a non-breaking space, say) keeps it until the memory's next
-  write, which trims it.
+  non-ASCII space (a non-breaking space, say) keeps it until the memory's labels
+  are next saved: any edit from the web app does that, but an API or MCP update
+  that omits `labels` does not.
 - **Old clients keep working, with one catch.** A client that still sends
   `metadata: {"tags": [...]}` on a memory has those tags folded into `labels` by
   the server (normalised and capped the same way, never rejected), so nothing
