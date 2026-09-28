@@ -12,8 +12,11 @@ Published at **[vibexp.io](https://vibexp.io)**.
 | `/blog/` | Blog, from [`src/content/blog/`](src/content/blog/) |
 
 It is built with [Astro](https://astro.build) and
-[Starlight](https://starlight.astro.build), on the same template and design
-system (`@shaharia-lab/agento-code`) as the other Shaharia Lab open-source sites.
+[Starlight](https://starlight.astro.build), themed and extended by
+[`@shaharia-lab/site-kit`](https://github.com/shaharia-lab/site-kit), the layer
+shared by the Shaharia Lab open-source sites: the `agento-code` theme, page
+actions (Copy page, Open in ChatGPT / Claude, View as Markdown, Edit on GitHub),
+a Markdown twin of every docs page at its URL plus `.md`, and `llms.txt`.
 
 ## Working on it
 
