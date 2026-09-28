@@ -16,8 +16,10 @@ It is built on the same template as the other Shaharia Lab open-source sites
 uniform with them in look, structure and tooling. The difference: those live in
 a `web/` folder inside their product repo, while here the site IS the repo, so
 everything sits at the root and the product lives elsewhere (`vibexp/vibexp`).
-When a fix lands in one of the sibling sites' template files, port it here, and
-the other way round.
+The shared look and docs chrome now come from `@shaharia-lab/site-kit`, so a fix
+to those lands once in site-kit and reaches every site with a version bump.
+When a fix lands in one of the sibling sites' remaining template files (sync and
+release scripts, landing components), port it here, and the other way round.
 
 ## Commands
 
@@ -37,12 +39,19 @@ every PR. Run all three before committing.
 
 - **Astro + Starlight.** Starlight owns `/docs/`; everything else is a plain
   Astro page under `src/pages/` using `src/layouts/Page.astro`.
-- **Design:** tokens come from the public npm package `@shaharia-lab/agento-code`
-  (shared by every sibling site), imported through `src/styles/tokens.css`, the
-  one stylesheet both halves of the site load. VibeXP uses the `ink` accent
-  (monochrome); tokens.css pins it for the Starlight half too. Fonts are
-  self-hosted via `@fontsource` (`src/styles/fonts.css`). Use token variables,
-  never raw colours.
+- **Design and docs chrome come from `@shaharia-lab/site-kit`** (repo
+  shaharia-lab/site-kit), passed to Starlight as `plugins: siteKit({...})` in
+  `astro.config.mjs`. Its `agento-code` theme (tokens from
+  `@shaharia-lab/agento-code`, self-hosted fonts, the Starlight surfaces, code
+  blocks) styles the docs; `src/layouts/Page.astro` imports the same theme
+  files for the landing page and blog. VibeXP uses the `ink` accent
+  (monochrome). The kit also adds the page actions, `.md` twins, `llms.txt`
+  and the Star button. A look or docs-chrome change belongs in site-kit, not
+  here; only site-specific CSS lives in `src/styles/` (`site.css`,
+  `consent.css`). Use token variables, never raw colours.
+- **Edit on GitHub** is mapped from `docs.manifest.mjs` (entry id to
+  `docs/<file>`) in `astro.config.mjs`, because the generated pages under
+  `src/content/docs/` are gitignored and would 404.
 - **Docs:** `docs/` is the single source, plain Markdown that reads on GitHub
   (H1 title, relative `.md` links). `scripts/sync-docs.mjs` generates
   `src/content/docs/docs/` (gitignored, never edit). Every file must be listed
