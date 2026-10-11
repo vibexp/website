@@ -2,7 +2,7 @@
   "name": "vibexp-site",
   "private": true,
   "type": "module",
-  "license": "AGPL-3.0-or-later",
+  "license": "MIT",
   "scripts": {
     "sync": "node scripts/sync-docs.mjs && node scripts/fetch-release.mjs",
     "dev": "npm run sync && astro dev",

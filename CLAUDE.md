@@ -92,4 +92,4 @@ sites). Analytics only exist when the `PUBLIC_GTM_ID` repo variable is set.
 
 - TypeScript strict via `astro check`; no `any` in new code.
 - Comments explain why, in the voice of the existing files.
-- License: AGPL-3.0-or-later.
+- License: MIT.

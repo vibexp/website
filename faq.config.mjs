@@ -44,7 +44,7 @@ export const FAQ = [
   },
   {
     q: 'Is there a hosted version, or do I run it myself?',
-    a: `You run it. VibeXP is free and open source under AGPL-3.0, and ships as one
+    a: `You run it. VibeXP is free and open source under the MIT license, and ships as one
         container image that serves the app, the API and the MCP endpoint from a single
         port, next to PostgreSQL with pgvector. docker compose up gets you a local
         instance with nothing to configure; a public one needs a URL, a few secrets and

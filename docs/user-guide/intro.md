@@ -2,7 +2,7 @@
 
 VibeXP is your personal AI productivity platform that helps you efficiently use AI tools and maximize your productivity. Transform scattered AI outputs into organized, searchable knowledge bases while maintaining persistent context across all your conversations.
 
-VibeXP is **open source** — you can [self-host](self-hosting/README.md) your own instance on your own domain, with no paid tiers. See [Open Source](open-source/README.md) for the license model and how to get involved.
+VibeXP is **open source** — you can [self-host](self-hosting/README.md) your own instance on your own domain, with no paid tiers. See [Open Source](open-source/README.md) for the license and how to get involved.
 
 ## What is VibeXP?
 

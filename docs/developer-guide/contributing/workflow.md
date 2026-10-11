@@ -132,8 +132,8 @@ instead.
 
 ## Licensing
 
-VibeXP is open-core under **AGPL-3.0-or-later**. When you add files, follow the
-license of the directory they live in.
+VibeXP is licensed under **MIT**, in every repository. Contributions are
+accepted under the same license.
 
 ## Security disclosures
 
