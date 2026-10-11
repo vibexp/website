@@ -104,7 +104,7 @@ export const PAGES = [
     description: "Connect your team's own GitHub App to VibeXP. Create the App, grant the right permissions and events, paste the credentials, wire the webhook, and troubleshoot a setup that is not receiving events." },
 
   { file: "user-guide/open-source/README.md", slug: "user-guide/open-source", label: "Open Source", group: "selfhost",
-    description: "VibeXP is open source. Learn about its open-core license model, the monorepo layout, and how to get involved." },
+    description: "VibeXP is open source. Learn about its MIT license, the monorepo layout, and how to get involved." },
   { file: "user-guide/self-hosting/README.md", slug: "user-guide/self-hosting", label: "Self-Hosting", group: "selfhost",
     description: "Run your own VibeXP instance on your own infrastructure and domain with Docker Compose. Covers the configuration model, authentication options, embeddings, and object storage." },
   { file: "user-guide/self-hosting/authentication.md", slug: "user-guide/self-hosting/authentication", label: "Authentication & MCP Auth", group: "selfhost",

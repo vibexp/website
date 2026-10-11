@@ -8,20 +8,20 @@ The full source lives on GitHub at **[vibexp/vibexp](https://github.com/vibexp/v
 This repository is open-sourced from the production codebase. Billing and subscription code has been removed — **all features are available with no paid tiers**. Any references to "Free / Pro / Enterprise" tiers in older documentation are deployment-defined limits, not VibeXP product tiers.
 :::
 
-## License model (open-core)
+## License
 
-VibeXP uses an open-core license split. The **application core is AGPL-3.0-or-later**, and the **reusable integration tooling is MIT**:
+VibeXP is licensed under **MIT**: one license for every repository in the project.
 
 | Component | Repository | License |
 | --- | --- | --- |
-| Core REST + MCP API (`backend/`) | `vibexp/vibexp` | AGPL-3.0-or-later |
-| Web application (`frontend/`) | `vibexp/vibexp` | AGPL-3.0-or-later |
-| Website, documentation and blog | `vibexp/website` | AGPL-3.0-or-later |
+| Core REST + MCP API (`backend/`) | `vibexp/vibexp` | MIT |
+| Web application (`frontend/`) | `vibexp/vibexp` | MIT |
+| Website, documentation and blog | `vibexp/website` | MIT |
 | Command-line client | `vibexp/cli` | MIT |
 | Generated TS API client (`@vibexp/api-client`) | `vibexp/api-client-js` | MIT |
 | Design tokens + brand (`@vibexp/design-system`) | separate package | MIT |
 
-When you add files, follow the license of the repository they live in.
+Versions of `vibexp/vibexp` up to and including the 0.14 line were published under AGPL-3.0-or-later and keep that license. MIT applies from the next release on.
 
 ## Repository layout
 

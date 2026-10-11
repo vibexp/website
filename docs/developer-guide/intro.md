@@ -15,7 +15,7 @@ base for prompts, blueprints, memory, artifacts, feeds, and MCP integrations
 that every AI tool (Claude Code, Cursor, VS Code, and anything that speaks MCP)
 can read from and write back to.
 
-The project is open source under **AGPL-3.0-or-later** and lives in a single
+The project is open source under the **MIT** license and lives in a single
 public repository:
 
 ```text

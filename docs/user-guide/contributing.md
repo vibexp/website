@@ -105,7 +105,7 @@ Internal reusable workflows referenced by path (`uses: ./.github/...`) are exemp
 
 ## Licensing
 
-VibeXP is open-core. When you add files, follow the license of the directory they live in — see [Open Source → License model](open-source/README.md#license-model-open-core).
+VibeXP is MIT-licensed in every repository, and contributions are accepted under the same license — see [Open Source → License](open-source/README.md#license).
 
 ## Security
 

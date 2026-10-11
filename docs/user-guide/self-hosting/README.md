@@ -139,5 +139,5 @@ The "VibeXP" name and logo are the project maintainer's brand. To white-label th
 
 ## Next steps
 
-- [Open Source](../open-source/README.md) — license model and where to file issues.
+- [Open Source](../open-source/README.md) — license and where to file issues.
 - [Contributing](../contributing.md) — set up a dev environment and open a PR.
