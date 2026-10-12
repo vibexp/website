@@ -85,8 +85,9 @@ It is multi-stage:
    into `frontend/dist`. Only deployment-neutral build args are passed:
    `VITE_API_BASE_URL=/api/v1` (relative — the API is same-origin in the
    combined image) and the release stamps `VITE_RELEASE_SHA` /
-   `VITE_RELEASE_DATE`. Branding/analytics are **not** build args — they are
-   injected at runtime via `/config.js`.
+   `VITE_RELEASE_DATE`. Branding/analytics are **not** build args — analytics
+   is injected at runtime via `/config.js`, and branding is the instance's
+   site info, set in the admin area.
 2. **Backend stage (`golang:1.25.12-alpine`).** Copies the backend source,
    copies `frontend/dist` into `internal/server/dist`, and builds with
    `-tags embedfrontend`.

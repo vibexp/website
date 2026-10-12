@@ -95,9 +95,13 @@ reset the data volume (`docker compose down -v`) if you change it later.
 The SPA is embedded in the backend and served same-origin, so there is no
 frontend deployment to configure. The backend serves runtime configuration at
 **`/config.js`** (as `window.__VIBEXP_ENV__`), rendered from the `frontend.*`
-config keys (`VITE_SITE_NAME`, `VITE_SITE_URL`, `VITE_SUPPORT_EMAIL`,
-`VITE_MCP_ENDPOINT`, GTM/GA4 analytics, …) — rebrand with an env var and a
-restart, no rebuild. Never put secrets there: `/config.js` is world-readable.
+config keys (`VITE_MCP_ENDPOINT`, GTM/GA4 analytics, …) — change one with an
+env var and a restart, no rebuild. Never put secrets there: `/config.js` is
+world-readable.
+
+Company branding (name, logo, support and legal links) is not an env var. An
+instance admin sets it in the admin area under **Settings** → **Site info**:
+see [Site Info (Branding)](../../user-guide/self-hosting/site-info.md).
 
 The only frontend **build**-time values are deployment-neutral: the relative
 `VITE_API_BASE_URL=/api/v1` and the `VITE_RELEASE_SHA` / `VITE_RELEASE_DATE`

@@ -246,16 +246,20 @@ production set them explicitly (e.g. `https://connect.example.com/mcp/v1/common`
 
 The `frontend` block holds the SPA base URL plus deploy-time, non-secret values
 the backend serves to the SPA at **`/config.js`** (as
-`window.__VIBEXP_ENV__`). Each field mirrors a `VITE_*` value the frontend
-would otherwise bake in at build time; empty values fall back to the SPA's
-built-in defaults.
+`window.__VIBEXP_ENV__`). Each of those fields mirrors a `VITE_*` value the
+frontend would otherwise bake in at build time; empty values fall back to the
+SPA's built-in defaults.
+
+Company branding is not here. Since v0.15.0 the name, logo and support and
+legal links are the instance's site info, stored in the database and edited in
+the admin area: see
+[Site Info (Branding)](../../user-guide/self-hosting/site-info.md). The seven
+branding keys this block used to hold are ignored, as listed in
+[Upgrading](../../user-guide/self-hosting/upgrading.md#company-branding-moved-to-site-info-v0150).
 
 | Key | Default | Purpose |
 | --- | --- | --- |
 | `frontend.base_url` | `http://localhost:5173` | Public URL of the web app (redirects, email links). Also the **local-development detection signal**: a localhost value enables dev-only paths. In the combined image, set it to your public URL. |
-| `frontend.site_name` / `frontend.site_legal_name` / `frontend.site_url` | _(empty)_ | Branding shown by the SPA. |
-| `frontend.terms_url` / `frontend.privacy_url` / `frontend.support_email` | _(empty)_ | Legal/support links. |
-| `frontend.brand_logo_url` | _(empty)_ | Logo URL. |
 | `frontend.mcp_endpoint` | _(empty)_ | MCP endpoint URL shown in the connect UI. |
 | `frontend.error_type_base_uri` | _(empty)_ | RFC 9457 base URI the SPA links error codes to. |
 | `frontend.gtm_id` / `frontend.ga4_measurement_id` | _(empty)_ | Optional analytics. Setting `gtm_id` **is** the opt-in: the SPA loads Google Tag Manager only when it is non-empty. There is no separate enable flag, and VibeXP ships no cookie-consent gate of its own, so configure consent inside your own tag container. |
@@ -370,9 +374,11 @@ The exact rules are in the
 | `email.from_address` | `dev@vibexp.local` (example file) | Sender address for all providers. Empty falls back to `email.smtp.username` when that is itself an email address; with neither, nothing is imported. |
 | `email.contact_recipient_address` | _(empty)_ | Inbox for support notification emails. Empty uses the from address. |
 
-`email.privacy_policy_url` is gone: v0.15.0 ignores the key, logs a warning at
-startup while it is still set, and does not import it. The privacy policy link
-is part of the instance's site info now, set in the admin area.
+The privacy policy URL key this section used to hold is gone: v0.15.0 ignores
+it, logs a warning at startup while it is still set, and does not import it.
+The privacy policy link is part of the instance's
+[site info](../../user-guide/self-hosting/site-info.md) now, set in the admin
+area.
 
 **SMTP** (`email.provider: smtp`). Dev defaults point at Mailpit (UI at
 `http://localhost:8025`).

@@ -75,8 +75,9 @@ repos under the [`vibexp` organization](https://github.com/vibexp).
   origin as the API — one image, one port.
 - **Deployment-agnostic.** Built with a relative `VITE_API_BASE_URL=/api/v1`
   (same-origin, no proxy to configure) and configured at **runtime** via the
-  backend-served `/config.js` (`window.__VIBEXP_ENV__`) — branding and
-  analytics change with an env var and a restart, not a rebuild. The frontend
+  backend-served `/config.js` (`window.__VIBEXP_ENV__`) — the MCP endpoint
+  and analytics change with an env var and a restart, not a rebuild, and
+  company branding is edited in the admin area (site info). The frontend
   never hardcodes a backend origin.
 
 ### Shared packages

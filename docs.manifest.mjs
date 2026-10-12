@@ -115,6 +115,8 @@ export const PAGES = [
     description: "Set up sign-in for a self-hosted VibeXP: first-run setup through the logged setup URL, Google, GitHub and OIDC providers and the access allowlist in the admin area, and the embedded OAuth 2.1 Authorization Server that secures the MCP endpoint." },
   { file: "user-guide/self-hosting/instance-admin.md", slug: "user-guide/self-hosting/instance-admin", label: "Instance Admin Portal", group: "selfhost",
     description: "Give instance-wide operators the admin portal on your self-hosted VibeXP: root admins from the configuration, admins granted in the admin area, and what the portal shows and configures." },
+  { file: "user-guide/self-hosting/site-info.md", slug: "user-guide/self-hosting/site-info", label: "Site Info (Branding)", group: "selfhost",
+    description: "Brand your self-hosted VibeXP in Admin, Settings, Site info: company name, contact email, website, support, terms and privacy links, and light and dark logos. What each value shows, what happens when it is empty, and the VibeXP attribution that always remains." },
   { file: "user-guide/self-hosting/lockout-recovery.md", slug: "user-guide/self-hosting/lockout-recovery", label: "Lockout Recovery", group: "selfhost",
     description: "Get back into a self-hosted VibeXP after an authentication misconfiguration: the admin auth commands to list, enable and disable providers, clear the allowlist and re-arm setup, and the recovery mode flag." },
   { file: "user-guide/self-hosting/search-and-ai-summary-settings.md", slug: "user-guide/self-hosting/search-and-ai-summary-settings", label: "Search & AI Summary Settings", group: "selfhost",

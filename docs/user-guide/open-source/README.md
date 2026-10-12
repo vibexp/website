@@ -43,7 +43,7 @@ VibeXP is split across several repositories under [`github.com/vibexp`](https://
 
 ## Branding
 
-The "VibeXP" name and logo are brand assets of the project maintainer. If you run a fork, use your own name and branding — the site/email branding and all domains are overridable via environment variables. See [Self-Hosting → Branding](../self-hosting/README.md#branding).
+The "VibeXP" name and logo are brand assets of the project maintainer. If you run a fork, use your own name and branding — the app and email branding is set by an instance admin under Site info, and all domains are overridable via environment variables. See [Self-Hosting → Branding](../self-hosting/README.md#branding).
 
 ## Next steps
 

@@ -66,6 +66,7 @@ Instance admins get an **`/admin` portal** in the web app, reachable from the **
 Since v0.15.0 the portal is also where the instance's settings are edited, under **Settings**:
 
 - **Authentication**: the sign-in providers, the access allowlist, the instance admins, and a change history with a tab for each (**Providers**, **Allowlist**, **Admins**, **Setup**). See [Authentication & MCP Auth](authentication.md). If a change there locks you out, see [Lockout Recovery](lockout-recovery.md).
+- **Site info**: the company name, logo and links shown across the instance and in its emails. See [Site Info (Branding)](site-info.md).
 - **Email**: the instance's outbound mail. See [Instance Email](instance-email.md).
 - **Search** and **AI Summary**: the search ranking and AI summary defaults. See [Search & AI Summary Settings](search-and-ai-summary-settings.md).
 
