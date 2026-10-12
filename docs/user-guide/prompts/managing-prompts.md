@@ -9,7 +9,7 @@ Navigate to **Prompts** → **My Prompts** from the left sidebar to see your pro
 The prompts list displays:
 - **Name**: Prompt title with icons indicating special features (MCP-enabled, references, etc.)
 - **Description**: Brief summary of the prompt's purpose
-- **Status**: Draft (yellow badge) or Published (green badge)
+- **Status**: Draft (yellow badge), Published (green badge), or one of your team's [custom statuses](../statuses.md)
 - **Updated**: Last modification date
 - **Actions**: View, Edit, and Delete buttons
 
@@ -39,6 +39,7 @@ Click the **All Status** dropdown to filter by:
 - **All Status**: Show all prompts regardless of status
 - **Draft**: Show only work-in-progress prompts
 - **Published**: Show only finalized prompts
+- Any [custom status](../statuses.md) your team has added for prompts
 
 Use this to focus on prompts that need finishing or to view only production-ready templates.
 

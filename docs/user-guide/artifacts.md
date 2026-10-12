@@ -38,7 +38,7 @@ Artifacts are substantial pieces of AI-generated content:
    - **Description**: Brief summary (optional)
    - **Type**: any of your team's artifact types (default: general)
    - **Content**: Your artifact content (supports Markdown)
-   - **Status**: active or expired
+   - **Status**: active, draft, or archived
 4. Click **Save**
 
 ### Automatic Creation via MCP
@@ -91,9 +91,10 @@ one of your team's configured types.
 ### Status Management
 
 - **active**: Currently relevant artifacts
-- **expired**: Archived or outdated content
+- **draft**: Work in progress
+- **archived**: Retired or outdated content
 
-Change status anytime without deleting artifacts.
+Change status anytime without deleting artifacts. Your team can also add custom artifact statuses: see [Statuses](statuses.md).
 
 ### Linking to other resources
 
@@ -119,7 +120,7 @@ Finds all artifacts mentioning authentication and implementation.
 Filter by:
 - **Project**: Show artifacts from specific projects
 - **Type**: any of your team's artifact types
-- **Status**: active or expired
+- **Status**: active, draft, archived, or one of your team's custom statuses
 - **Creation Date**: Date range filtering
 - **Metadata**: Match on any metadata key-value pairs. Pick a key, then one
   or more values (with typeahead from the values your team actually uses).
@@ -192,7 +193,7 @@ Access metadata in search and filtering.
 
 1. Select artifacts
 2. Click **Bulk Actions** → **Update Status**
-3. Choose new status (active/expired)
+3. Choose new status (active, draft, or archived)
 
 ## MCP Integration
 
@@ -316,7 +317,7 @@ Examples:
 - Use Markdown for formatting
 - Include context in descriptions
 - Tag with relevant metadata
-- Regular cleanup of expired artifacts
+- Regular cleanup of archived artifacts
 
 ### Search Optimization
 
@@ -373,7 +374,7 @@ Artifacts are scoped to a **team**. Everyone in the team can access the team's a
 
 ### How long are artifacts stored?
 
-Artifacts are stored indefinitely until you delete them. Use status "expired" to archive without deleting.
+Artifacts are stored indefinitely until you delete them. Use status "archived" to retire an artifact without deleting it.
 
 ## Related Features
 

@@ -72,7 +72,7 @@ curl -X GET \
 ```
 
 **Query parameters:**
-- `status` - Filter by status (`draft` or `published`)
+- `status` - Filter by status: `draft`, `published`, or the slug of one of the team's [custom statuses](../statuses.md). An unknown value returns `400`
 - `labels` - Comma-separated list of labels to filter by. A prompt matches when it carries **any** of them (OR); before v0.13.0 it had to carry all of them, see [Upgrading](../self-hosting/upgrading.md#prompt-label-filter-now-matches-any-label-v0130). Each label is trimmed and empty entries are ignored. More than 25 labels, or a label longer than 50 characters, is rejected with `400`. See [Labels](../labels.md#filtering-by-label)
 - `search` - Search in title, description, or content
 - `project_id` - Filter by project
@@ -148,7 +148,7 @@ curl -X POST \
   "title": "string (required)",
   "description": "string (optional, max 200 chars)",
   "content": "string (required)",
-  "status": "draft | published (optional, default: draft)",
+  "status": "draft | published | a custom status slug (optional, default: draft)",
   "available_in_mcp": "boolean (optional, default: false)",
   "labels": ["array of strings (optional; the web app allows up to 10, the API does not check)"],
   "slug": "string (optional, auto-generated if not provided)"
@@ -193,7 +193,7 @@ All fields are optional. Only include fields you want to update:
   "title": "string",
   "description": "string",
   "content": "string",
-  "status": "draft | published",
+  "status": "draft | published | a custom status slug",
   "available_in_mcp": "boolean",
   "labels": ["array of strings"]
 }

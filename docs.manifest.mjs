@@ -77,6 +77,8 @@ export const PAGES = [
     description: "Filter artifacts, memories, and blueprints by the metadata your team actually stores, using one JSON query parameter with AND across keys and OR within a key, plus catalog endpoints and MCP tools that let an AI agent discover which keys and values exist." },
   { file: "user-guide/labels.md", slug: "user-guide/labels", label: "Labels", group: "user",
     description: "Labels are the one taxonomy shared by prompts, artifacts, blueprints, and memories: free-form words on every resource, a comma-separated list filter that matches any listed label, and the same argument on every MCP create and update tool." },
+  { file: "user-guide/statuses.md", slug: "user-guide/statuses", label: "Statuses", group: "user",
+    description: "Every prompt, artifact, blueprint, and memory carries a status. Each type has built-in statuses, and team owners and admins can add custom ones per resource type; a custom status is always live, and deleting one moves its resources to the type's default status." },
   { file: "user-guide/relations.md", slug: "user-guide/relations", label: "Relations", group: "user",
     description: "Relations are typed, directional links between your prompts, blueprints, memories, and artifacts, building a shared knowledge graph your AI and your team can navigate." },
   { file: "user-guide/mcp-server.md", slug: "user-guide/mcp-server", label: "MCP Server Integration", group: "user",
