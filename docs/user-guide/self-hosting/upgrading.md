@@ -36,6 +36,88 @@ in between.
 
 ## Breaking changes
 
+### Company branding moved to Site info (v0.15.0)
+
+The company branding of an instance (its name, logo, support and legal links)
+is no longer configured with `frontend.*` keys or `VITE_*` variables. It is
+**site info** now: stored in the database and edited by an instance admin in
+the admin area under **Settings** → **Site info**. See
+[Site Info (Branding)](site-info.md).
+
+These seven config keys are removed:
+
+`frontend.site_name`, `frontend.site_legal_name`, `frontend.site_url`,
+`frontend.terms_url`, `frontend.privacy_url`, `frontend.support_email`,
+`frontend.brand_logo_url`.
+
+So are the seven `VITE_*` variables that carried the same values:
+
+`VITE_SITE_NAME`, `VITE_SITE_LEGAL_NAME`, `VITE_SITE_URL`, `VITE_TERMS_URL`,
+`VITE_PRIVACY_URL`, `VITE_SUPPORT_EMAIL`, `VITE_BRAND_LOGO_URL`.
+
+In the published image, `VITE_SITE_NAME`, `VITE_SITE_URL`, `VITE_SUPPORT_EMAIL`
+and `VITE_BRAND_LOGO_URL` were the ones the image's own configuration read from
+the container environment. The other three took effect only through their
+`frontend.*` key in a mounted `config.yaml`, or in a frontend you built
+yourself.
+
+:::danger[Nothing is imported, and you may get no warning]
+Unlike the other settings that moved to the admin area in v0.15.0, these values
+are **not** imported. After the upgrade the instance shows VibeXP's own name and
+logo, and no support, terms or privacy links, until you enter the values again.
+
+Whether the server tells you depends on how you set them:
+
+- **In a mounted `config.yaml`**: the file still loads. For each of the keys
+  above that has a non-empty value, the server logs one warning,
+  `config key "frontend.site_name" is deprecated: ...`, and it logs it again on
+  **every** start until you delete the key.
+- **Only as environment variables**, which is the usual Docker and Docker
+  Compose setup: there is **no warning at all**. The configuration baked into
+  the image no longer reads those variables, so the server never sees them.
+:::
+
+What to do after upgrading:
+
+1. Sign in as an instance admin and open the admin area, then **Settings** →
+   **Site info**. If you have no instance admin, set `INSTANCE_ADMIN_EMAILS`
+   first (see [Instance Admin Portal](instance-admin.md)).
+2. Enter the values again. The old settings map to the fields like this:
+
+   | Old key / variable | Site info field |
+   | --- | --- |
+   | `frontend.site_name` / `VITE_SITE_NAME` | **Company name** |
+   | `frontend.site_url` / `VITE_SITE_URL` | **Website** |
+   | `frontend.support_email` / `VITE_SUPPORT_EMAIL` | **Company email** (the Support link falls back to it) |
+   | `frontend.terms_url` / `VITE_TERMS_URL` | **Terms of service URL** |
+   | `frontend.privacy_url` / `VITE_PRIVACY_URL` | **Privacy policy URL** |
+   | `frontend.brand_logo_url` / `VITE_BRAND_LOGO_URL` | **Logo URL** |
+   | `frontend.site_legal_name` / `VITE_SITE_LEGAL_NAME` | None. The copyright line uses the company name |
+
+   Two defaults are gone with the keys. The terms and privacy links used to
+   fall back to `/terms-and-conditions` and `/privacy-policy` under the site
+   URL; now a link shows only when you enter its URL. The brand logo used to be
+   only the link-preview image of a shared prompt; **Logo URL** is shown across
+   the app and in emails.
+3. Delete the keys from `config.yaml` and the variables from your deployment.
+
+**The privacy policy URL has one home now.** It used to be an email setting as
+well, printed in the email footer. In v0.15.0:
+
+- The `email.privacy_policy_url` config key is removed. Like the keys above, a
+  `config.yaml` that still sets it loads with a warning on every start, and the
+  value is ignored, not imported.
+- A privacy policy URL already **stored in the database** with the instance
+  email settings is moved into site info automatically, by migration `021`. It
+  is skipped, and the stored value dropped, when the value is empty, is the old
+  placeholder `https://example.com/privacy-policy`, is longer than 2048
+  characters, or site info already has a privacy policy URL.
+- The admin email settings API (`/api/v1/admin/settings/email`) no longer
+  returns `privacy_policy_url`, and a request that still sends it gets `400`.
+
+After upgrading, check **Privacy policy URL** on the Site info page: it is what
+the email footer, the sign-in page and the user menu link to.
+
 ### Sign-in providers and the access allowlist moved to the database (v0.15.0)
 
 The sign-in providers (Google, GitHub, OIDC) and the access allowlist are no
@@ -349,9 +431,9 @@ What to do after upgrading:
    `email:` section from a mounted `config.yaml`. Until you do, a restart after
    **Remove configuration** imports them again.
 
-`email.privacy_policy_url` is not carried over. v0.15.0 ignores the key and
-warns about it at startup; set the privacy policy link in the admin area's
-**Site info** settings instead, then delete the key.
+The privacy policy URL from the `email:` section is not carried over: it is
+part of site info now. See
+[Company branding moved to Site info](#company-branding-moved-to-site-info-v0150).
 
 The `email:` section will be removed in the next minor release, where a
 `config.yaml` that still contains it will stop the server from starting. Do

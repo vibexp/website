@@ -61,9 +61,10 @@ VITE_API_BASE_URL=/api/v1
 In production, **the backend serves the SPA from the same origin** as the API
 (the combined image), so relative requests just work. Keep API calls relative so
 the same build runs against any deployment. Likewise, deploy-time frontend
-values (branding, MCP endpoint, analytics) are injected at **runtime** via the
+values (MCP endpoint, analytics) are injected at **runtime** via the
 backend-rendered `/config.js` (`window.__VIBEXP_ENV__`) — never baked into the
-bundle.
+bundle. Company branding is the instance's site info: read it with
+`useSiteInfo()`, never from an env value.
 
 ### No precaching service worker
 

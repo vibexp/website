@@ -136,7 +136,7 @@ All disabled by default, enabled via env vars or a mounted `config.yaml` (see `b
 
 ## Branding
 
-The "VibeXP" name and logo are the project maintainer's brand. To white-label the app, set the branding env vars on the `app` service (`VITE_SITE_NAME`, `VITE_SITE_URL`, `VITE_BRAND_LOGO_URL`, …) — they are served to the SPA at runtime via `/config.js`, so a restart applies them without a rebuild. The independent static sites (website, blog, docs) have their own `VITE_*` / `PUBLIC_*` env vars in their repos.
+The "VibeXP" name and logo are the project maintainer's brand. To show your own company name, logo and support and legal links in the app and in its emails, sign in as an instance admin and fill in **Settings** → **Site info** in the admin area: see [Site Info (Branding)](site-info.md). A save applies without a restart or a rebuild, and VibeXP stays credited as "Powered by VibeXP". Since v0.15.0 no environment variable sets the branding. The independent static sites (website, blog, docs) have their own `VITE_*` / `PUBLIC_*` env vars in their repos.
 
 ## Next steps
 

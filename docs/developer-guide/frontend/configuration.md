@@ -15,9 +15,9 @@ This is the most important distinction:
 - **Deploy-time values come from the _runtime_ `/config.js`.** In production the
   backend renders `/config.js` from its `frontend.*` configuration (see
   [Backend Configuration](../backend/configuration.md)), setting
-  `window.__VIBEXP_ENV__` before the SPA bundle runs. Branding, site links, MCP
-  endpoint, and analytics are all injected this way — changing them needs a
-  restart, **not a rebuild**. In local dev there is no backend-rendered
+  `window.__VIBEXP_ENV__` before the SPA bundle runs. The MCP endpoint and
+  analytics are injected this way — changing them needs a restart, **not a
+  rebuild**. In local dev there is no backend-rendered
   `/config.js` (the request 404s harmlessly) and the app falls back to the
   build-time `import.meta.env` values.
 
@@ -44,20 +44,18 @@ Build-time only, set by the release pipeline (build args in
 | `VITE_RELEASE_SHA` | `dev` | Commit SHA of the build. `release.yml` passes `github.sha`. |
 | `VITE_RELEASE_DATE` | `unknown` | Build date stamp. |
 
-## Branding / site links
+## Branding
 
-All optional, with neutral defaults. In production these come from the backend's
-`frontend.*` config via `/config.js`; the `VITE_*` forms apply in local dev.
+Company branding is not a `VITE_*` variable. Since v0.15.0 the name, logo and
+support and legal links are the instance's **site info**, which an instance
+admin edits in the admin area: see
+[Site Info (Branding)](../../user-guide/self-hosting/site-info.md).
 
-| Variable | Notes |
-|---|---|
-| `VITE_SITE_NAME` | Product / brand display name. |
-| `VITE_SITE_LEGAL_NAME` | Legal entity name in copyright notices (defaults to `VITE_SITE_NAME`). |
-| `VITE_SITE_URL` | Public marketing / home site URL. |
-| `VITE_TERMS_URL` | Terms & Conditions page (defaults to `<VITE_SITE_URL>/terms-and-conditions`). |
-| `VITE_PRIVACY_URL` | Privacy Policy page (defaults to `<VITE_SITE_URL>/privacy-policy`). |
-| `VITE_SUPPORT_EMAIL` | Support contact email. |
-| `VITE_BRAND_LOGO_URL` | Absolute URL to the brand logo (OpenGraph image on shared pages). |
+The backend inlines the eight values into the same `/config.js`, as
+`window.__VIBEXP_SITE_INFO__`, so the first paint is already branded, and
+serves them again at `GET /api/v1/site-info`. Components read them through the
+`useSiteInfo()` hook, never from `getEnv()`. In local dev, where there is no
+backend-rendered `/config.js`, the app starts unbranded.
 
 ## MCP
 

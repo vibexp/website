@@ -80,9 +80,11 @@ frontend/src/
 In production the frontend and the API share **one origin**: the backend serves
 the embedded SPA and the API from the same port, so the image is built with a
 **relative** API base URL (`VITE_API_BASE_URL=/api/v1`) and all requests are
-same-origin. Deploy-time values (branding, MCP endpoint, analytics) are not
+same-origin. Deploy-time values (MCP endpoint, analytics) are not
 baked into the bundle either — the backend renders them at runtime as
-`/config.js` (`window.__VIBEXP_ENV__`), loaded before the SPA bundle.
+`/config.js` (`window.__VIBEXP_ENV__`), loaded before the SPA bundle. The same
+file carries the instance's company branding, its site info, as
+`window.__VIBEXP_SITE_INFO__`.
 
 In local development the two run as separate processes: the Vite dev server on
 **:5173**, the backend on **:8080**, and the SPA calls the backend directly —
