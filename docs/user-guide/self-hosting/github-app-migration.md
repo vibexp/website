@@ -65,7 +65,9 @@ on credentials that are no longer read, believing the integration is configured.
 `auth.github` is the GitHub **web-login** OAuth client, a different credential
 set on a different code path. It is **unaffected** by this release. Only the
 **top-level** `github:` section is removed. `GITHUB_CLIENT_SECRET` belongs to
-`auth.github` and must stay.
+`auth.github` and must stay. (From v0.15.0 the web-login client is imported
+into the database at the first start and that variable is then ignored: see
+[Upgrading](upgrading.md#sign-in-providers-and-the-access-allowlist-moved-to-the-database-v0150).)
 :::
 
 ### 2. Remove the unused environment variables

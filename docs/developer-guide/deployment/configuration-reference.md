@@ -58,14 +58,23 @@ local evaluation only.
 | `DB_SSLMODE` | `database.sslmode` | `disable` (default) or `require`. Set `require` for managed Postgres that mandates TLS. |
 | `SESSION_ENCRYPTION_KEY` | `auth.session_encryption_key` | 64 hex chars (32 bytes) backing the session cookie and OAuth state HMAC. Generate: `openssl rand -hex 32`. |
 | `FRONTEND_BASE_URL` | `frontend.base_url` | Your real public URL, e.g. `https://<your-app-host>` — the single origin serving both SPA and API. A non-localhost value automatically disables the dev-login bypass. |
-| `AUTH_PROVIDER` | `auth.provider` | One of `google`, `github`, `oidc`. Several at once needs a mounted `config.yaml` with `auth.providers: [...]`. |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (or `GITHUB_*`, `OIDC_*`) | `auth.<provider>.*` | Credentials for the chosen provider (plus `*_REDIRECT_URI` if it differs from `<FRONTEND_BASE_URL>/api/v1/auth/callback`, and `OIDC_ISSUER_URL` for OIDC). |
 | `OAUTH_AS_ISSUER_URL` | `auth.oauth_as.issuer_url` | Public **HTTPS** URL enabling the embedded OAuth 2.1 Authorization Server (MCP tokens). |
 | `MCP_RESOURCE_URI` | `mcp.resource_uri` | Public MCP URL, the required token audience (RFC 8707), e.g. `https://<your-app-host>/mcp/v1/common`. |
-| `INSTANCE_ADMIN_EMAILS` | `auth.instance_admins` | Comma-separated emails granted the `/api/v1/admin` portal. Empty leaves the feature dormant. Since v0.15.0 an instance admin is also required to configure the instance's outbound mail ([Instance Email](../../user-guide/self-hosting/instance-email.md)), so with this empty and no mail configured nobody can set it up. |
-| `AUTH_ALLOWED_DOMAINS` / `AUTH_ALLOWED_EMAILS` | `auth.access_allowlist.*` | Optional. Restrict sign-in by email domain and/or exact address (comma-separated). A user is allowed if either matches; both empty means open. |
+| `INSTANCE_ADMIN_EMAILS` | `auth.instance_admins` | Comma-separated emails of the **root** instance admins: they get the admin portal, finish first-run setup, and are the only ones who can grant the role to others ([Instance Admin Portal](../../user-guide/self-hosting/instance-admin.md)). Set at least one before the first start. Since v0.15.0 an instance admin is also required to configure the instance's outbound mail ([Instance Email](../../user-guide/self-hosting/instance-email.md)), so with this empty and no mail configured nobody can set it up. |
+| `AUTH_SETTINGS_RECOVERY_MODE` | `auth.recovery_mode` | Leave unset. Set to `true` only to get back in after an authentication lockout: setup mode is forced on and every start logs a new one-time `SETUP URL`, while the configured providers keep working. Remove it once sign-in works again. See [Lockout Recovery](../../user-guide/self-hosting/lockout-recovery.md). |
 | `TRUSTED_PROXIES` | `server.trusted_proxies` | Set if you run behind a reverse proxy or load balancer. Comma-separated CIDRs allowed to assert a client IP via `X-Forwarded-For` / `X-Real-IP` (e.g. `10.0.0.0/8,172.16.0.0/12`; `192.168.1.5/32` for one host). Empty ignores those headers and uses the connecting peer, correct for a directly exposed instance. Left empty behind a proxy, per-IP rate limits collapse into one bucket and logs show the proxy address; the backend warns at startup. An invalid CIDR fails startup. |
 | `OUTBOUND_ALLOWED_CIDRS` | `security.outbound_allowed_cidrs` | Comma-separated CIDRs the SSRF guard may dial even though they are loopback or private. Empty (the default) refuses every reserved range, which is what blocks a self-hosted embedding or model sidecar on a private Docker subnet. Declare only the network your own service runs on (e.g. `172.16.0.0/12`, or `127.0.0.1/32` for a same-host Ollama). Link-local (`169.254.0.0/16`, `fe80::/10`, i.e. cloud metadata) and multicast (`224.0.0.0/4`, `ff00::/8`) can never be allowlisted; a malformed CIDR or one overlapping those ranges fails startup. Local development is exempt: a localhost `FRONTEND_BASE_URL` already permits reserved ranges. |
+
+:::note[Sign-in providers are not in this table]
+Since v0.15.0 the sign-in providers (Google, GitHub, OIDC) and the access
+allowlist are stored in the database and managed in the admin area under
+**Settings** → **Authentication**, not set through environment variables. A new
+instance logs a one-time `SETUP URL` at startup for adding the first provider:
+see [Authentication & MCP Auth](../../user-guide/self-hosting/authentication.md#first-run-setup).
+The variables earlier releases used for this are deprecated and only imported
+at startup while nothing is stored: see the
+[upgrade note](../../user-guide/self-hosting/upgrading.md#sign-in-providers-and-the-access-allowlist-moved-to-the-database-v0150).
+:::
 
 :::note[Native-CLI login on REST auto-wires]
 Enabling the embedded AS (`OAUTH_AS_ISSUER_URL`) is enough for the native CLI's

@@ -43,8 +43,9 @@ Its `environment:` block carries the database connection (`DB_HOST: postgres`,
 `DB_USER`, `DB_PASSWORD`, `DB_NAME`), the required `ENCRYPTION_KEY`, plus
 `SESSION_ENCRYPTION_KEY` (needed for production session auth; empty disables cookie sessions) and the public origin (`FRONTEND_BASE_URL`). Other baked
 operator knobs include `DB_SSLMODE` (`require` for managed Postgres TLS),
-`INSTANCE_ADMIN_EMAILS` (grants the admin portal), and
-`AUTH_ALLOWED_DOMAINS` / `AUTH_ALLOWED_EMAILS` (restrict sign-in). Its
+and `INSTANCE_ADMIN_EMAILS` (names the root instance admins). Sign-in providers
+and the access allowlist are not environment variables: they are managed in the
+admin area ([Authentication & MCP Auth](../../user-guide/self-hosting/authentication.md)). Its
 healthcheck hits `http://localhost:8080/ping`. See
 [Configuration Reference](configuration-reference.md)
 for which of these you must change for production.

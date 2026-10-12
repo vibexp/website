@@ -35,7 +35,7 @@ docker run -p 8080:8080 \
   ghcr.io/vibexp/vibexp:0.10.0
 ```
 
-The localhost `FRONTEND_BASE_URL` enables the dev-login bypass so you can sign in immediately. For a real deployment, set `FRONTEND_BASE_URL` to your public URL **and** configure a login provider (`AUTH_PROVIDER` + its client credentials + `SESSION_ENCRYPTION_KEY` — see [Authentication](#authentication)); otherwise the instance boots but has no way to sign in.
+The localhost `FRONTEND_BASE_URL` enables the dev-login bypass so you can sign in immediately. For a real deployment, set `FRONTEND_BASE_URL` to your public URL, `SESSION_ENCRYPTION_KEY` and `INSTANCE_ADMIN_EMAILS`, then add a sign-in provider through the setup URL the server logs at startup — see [Authentication](#authentication). Until a provider is enabled, nobody can sign in.
 
 ## Your domains
 
@@ -72,23 +72,24 @@ per team **in the app** (see [Search and embeddings](#search-and-embeddings)).
 
 ## Authentication
 
-VibeXP is **provider-agnostic** and brings its **own embedded OAuth 2.1 Authorization Server** in-house to secure the MCP endpoint — no third-party auth service required. Choose **Google**, **GitHub**, or a **generic OIDC** provider (Keycloak / Zitadel / Auth0 / Okta / …) via `AUTH_PROVIDER`:
+VibeXP is **provider-agnostic** and brings its **own embedded OAuth 2.1 Authorization Server** in-house to secure the MCP endpoint — no third-party auth service required. People sign in through **Google**, **GitHub**, or any number of **generic OIDC** providers (Keycloak / Zitadel / Auth0 / Okta / …).
+
+Since v0.15.0 the sign-in providers are not environment variables: they are stored in the database and managed in the admin area under **Settings** → **Authentication**. A new instance has none, so it logs a one-time setup URL at startup. Set these, start the instance, and open that URL to add your first provider:
 
 ```bash
-AUTH_PROVIDER=google                # one of: google, github, oidc
-SESSION_ENCRYPTION_KEY=<64 hex>     # encrypts the vx_session cookie
+SESSION_ENCRYPTION_KEY=<64 hex>              # encrypts the vx_session cookie
+INSTANCE_ADMIN_EMAILS=you@example.com        # the root admin who finishes setup
 ```
 
-To enable **several providers at once**, mount your own `config.yaml` over `/app/config.yaml` with a provider list — the multi-provider `auth.providers` field is not settable via env vars:
-
-```yaml
-auth:
-  providers: ["google", "github"]
+```bash
+docker compose logs app | grep "SETUP URL"
 ```
+
+Upgrading an instance that used `AUTH_PROVIDER` and the provider variables? They are imported at the first start and then ignored: see the [upgrade note](upgrading.md#sign-in-providers-and-the-access-allowlist-moved-to-the-database-v0150).
 
 For **local evaluation without a provider**, point `FRONTEND_BASE_URL` at localhost (the bundled compose file sets `http://localhost:8080`) — that enables the dev-login bypass, which only works on localhost. The bare image leaves `FRONTEND_BASE_URL` empty, which keeps dev-login off (fail-closed).
 
-➡️ See **[Authentication & MCP Auth](authentication.md)** for per-provider setup, the embedded Authorization Server, the full env-var matrix, and the HTTPS expectation.
+➡️ See **[Authentication & MCP Auth](authentication.md)** for first-run setup, per-provider setup, the access allowlist, the embedded Authorization Server, and the HTTPS expectation. Locked out? See **[Lockout Recovery](lockout-recovery.md)**.
 
 ## Search and embeddings
 

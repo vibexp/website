@@ -60,8 +60,9 @@ SESSION_ENCRYPTION_KEY=$(openssl rand -hex 32)
 DB_PASSWORD=...`,
       },
       {
-        t: 'Pick an identity provider, with its client id and secret:',
-        code: 'AUTH_PROVIDER=google   # or github, or oidc',
+        t: 'Name yourself as the root admin, start the instance, and open the setup URL from the logs to add a sign-in provider:',
+        code: `INSTANCE_ADMIN_EMAILS=you@example.com
+docker compose logs app | grep "SETUP URL"`,
       },
     ],
     more: { label: 'Self-hosting guide', path: '/docs/user-guide/self-hosting/' },

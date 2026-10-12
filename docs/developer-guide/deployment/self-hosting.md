@@ -91,11 +91,12 @@ internet.
   `postgres` service's `POSTGRES_PASSWORD`).
 - **`SESSION_ENCRYPTION_KEY`** — 64 hex chars (32 bytes) backing the session
   cookie. Generate one: `openssl rand -hex 32`.
-- **An identity provider** — set `AUTH_PROVIDER` to `google`, `github`, or
-  `oidc` with the matching `*_CLIENT_ID` / `*_CLIENT_SECRET` (and
-  `*_REDIRECT_URI` if it differs from
-  `<FRONTEND_BASE_URL>/api/v1/auth/callback`). For several providers at once,
-  mount a `config.yaml` with `auth.providers: [...]`.
+- **A sign-in provider**: not an environment variable since v0.15.0. Set
+  `INSTANCE_ADMIN_EMAILS` (below), start the instance, and open the one-time
+  `SETUP URL` it logs at startup to add Google, GitHub or OIDC providers. Each
+  provider's console needs `<FRONTEND_BASE_URL>/api/v1/auth/callback`
+  registered as its redirect URI. See
+  [Authentication & MCP Auth](../../user-guide/self-hosting/authentication.md#first-run-setup).
 - **MCP auth (optional)** — set `OAUTH_AS_ISSUER_URL` (your public HTTPS URL)
   **and** `MCP_RESOURCE_URI` (`<url>/mcp/v1/common`) to enable the embedded
   OAuth 2.1 Authorization Server that issues MCP tokens. In production its
@@ -111,11 +112,13 @@ internet.
   Link-local (cloud metadata) and multicast can never be allowlisted, and an
   entry that overlaps them fails startup.
 - **`DB_SSLMODE`**: set to `require` for managed Postgres that mandates TLS.
-- **`INSTANCE_ADMIN_EMAILS`**: comma-separated emails that get the
-  `/api/v1/admin` portal. Empty leaves it dormant.
-- **Sign-in allow-list (optional)**: set `AUTH_ALLOWED_DOMAINS` and/or
-  `AUTH_ALLOWED_EMAILS` to restrict who may sign in (a user is allowed if either
-  matches). While active it also requires a provider-verified email.
+- **`INSTANCE_ADMIN_EMAILS`**: comma-separated emails of the root instance
+  admins. They get the admin portal and are the ones who finish first-run
+  setup, so set at least one before the first start.
+- **Sign-in allowlist (optional)**: restrict who may sign in by email domain
+  or exact address in the admin area, under **Settings** → **Authentication**
+  (a user is allowed if either matches). While active it also requires a
+  provider-verified email.
 
 For the full setting list, see the
 [Configuration Reference](configuration-reference.md)
