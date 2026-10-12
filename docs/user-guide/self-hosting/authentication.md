@@ -29,7 +29,7 @@ Upgrading an instance that set `AUTH_PROVIDER` and the provider variables? See t
 The authentication settings sit behind sign-in, and a new instance has no sign-in provider yet. So while **no sign-in provider is enabled**, the instance is in **setup mode**: at startup the server logs a one-time setup URL at `WARN`.
 
 ```json
-{"level":"WARN","msg":"SETUP URL: https://<your-app-host>/setup?token=…","reason":"no identity provider is enabled; open this URL to configure sign-in","valid_until":"…"}
+{"time":"…","level":"WARN","msg":"SETUP URL: https://<your-app-host>/setup?token=…","reason":"no identity provider is enabled; open this URL to configure sign-in","valid_until":"…"}
 ```
 
 The URL is built on `FRONTEND_BASE_URL`, so set that to your public URL first. Find the line in the container logs:
@@ -38,7 +38,7 @@ The URL is built on `FRONTEND_BASE_URL`, so set that to your public URL first. F
 docker compose logs app | grep "SETUP URL"
 ```
 
-1. **Name a root admin before you start.** Set `INSTANCE_ADMIN_EMAILS` to your own email address (see [Instance Admin Portal](instance-admin.md)). Setup ends when a root admin signs in, and it is read from the configuration at startup, so adding it later needs a restart.
+1. **Name a root admin before you start.** Set `INSTANCE_ADMIN_EMAILS` to your own email address (see [Instance Admin Portal](instance-admin.md)); with the bundled `docker-compose.yml`, add it to the `app` service's `environment:` block. Setup ends when a root admin signs in, and it is read from the configuration at startup, so adding it later needs a restart.
 2. **Open the setup URL.** The page is headed **Set up sign-in for this instance**. The token is removed from the address bar as soon as the page loads, and a reload continues on the setup session's cookie.
 3. **Add and enable a sign-in provider**, as described in [Sign-in providers](#sign-in-providers) below. You can also set the [access allowlist](#restricting-who-can-sign-in-optional) here.
 4. **Finish.** Once a provider is enabled, a **Finish setup** card appears with a **Sign in with &lt;provider&gt; as a root admin to finish setup** button. Setup is finished when an address listed in `INSTANCE_ADMIN_EMAILS` signs in through an enabled provider.

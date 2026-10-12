@@ -155,11 +155,11 @@ the full model.
 
 | Key | Default | Purpose |
 | --- | --- | --- |
-| `auth.providers` | `[]` | **Deprecated since v0.15.0** (imported once at startup while no provider is stored, then ignored). Web-login providers to enable **simultaneously**: any of `google`, `github`, `oidc` (case-insensitive). Empty disables web login (dev login still works). Takes precedence over `auth.provider`. |
+| `auth.providers` | `[]` | **Deprecated since v0.15.0** (imported at startup while no provider is stored, otherwise ignored). Web-login providers to enable **simultaneously**: any of `google`, `github`, `oidc` (case-insensitive). Empty disables web login (dev login still works). Takes precedence over `auth.provider`. |
 | `auth.provider` | _(empty)_ | **Deprecated since v0.15.0**, like `auth.providers`. Backward-compatible single-provider shim; used only when `auth.providers` is empty. |
 | `auth.session_encryption_key` | `${SESSION_ENCRYPTION_KEY}` | Hex secret (**64 hex chars = 32 bytes**) backing the AES-256-GCM session cookie and the OAuth state HMAC. Empty disables cookie session auth. Generate with `openssl rand -hex 32`. |
 | `auth.dev_login_enabled` | `false` when unset (the shipped `config.example.yaml` and baked Docker config set `true`) | Gates `/api/v1/auth/dev/login`. Effective only when `true` **and** the environment is detected as local development. |
-| `auth.access_allowlist.domains` | `[]` | **Deprecated since v0.15.0** (imported at startup while no allowlist is stored, then ignored). Allowed email domains (matched exactly against the part after the last `@`). |
+| `auth.access_allowlist.domains` | `[]` | **Deprecated since v0.15.0** (imported at startup while no allowlist is stored, otherwise ignored). Allowed email domains (matched exactly against the part after the last `@`). |
 | `auth.access_allowlist.emails` | `[]` | **Deprecated since v0.15.0**, like `domains`. Allowed exact email addresses. A user may sign in if **either** list matches; both empty means open registration. While active, sign-in also requires a provider-verified email (unverified accounts are denied). |
 | `auth.recovery_mode` | `false` | Break-glass after an authentication lockout: forces setup mode on and logs a new one-time `SETUP URL` on every start, while the stored providers keep working. Wired to `AUTH_SETTINGS_RECOVERY_MODE` in the Docker config. |
 | `auth.instance_admins` | `[]` | Emails designated as **root** instance administrators; further admins are granted in the admin area. Drives `is_instance_admin` and the `/api/v1/admin` portal; matched case-insensitively and validated as emails at startup. |

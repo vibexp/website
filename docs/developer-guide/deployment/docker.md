@@ -63,8 +63,7 @@ baked default.
 :::caution
 There is no generic environment override: an env var only has an effect if the
 loaded `config.yaml` references it as `${VAR}`. Settings the baked file does not
-reference (multi-provider `auth.providers` lists, `auth.oauth_as.*` token TTLs,
-…) require mounting your own file (see below).
+reference (`auth.oauth_as.*` token TTLs, …) require mounting your own file (see below).
 :::
 
 ### Taking full control: mount your own `config.yaml`
@@ -90,7 +89,7 @@ docker run -p 8080:8080 \
   -e DB_HOST=your-db-host -e DB_PASSWORD=secret \
   -e ENCRYPTION_KEY="$(openssl rand -base64 24 | cut -c1-32)" \
   -e FRONTEND_BASE_URL=https://vibexp.example.com \
-  ghcr.io/vibexp/vibexp:0.10.0
+  ghcr.io/vibexp/vibexp:0.15.0
 ```
 
 The baked `FRONTEND_BASE_URL` defaults to **empty** (fail-closed: the dev-login

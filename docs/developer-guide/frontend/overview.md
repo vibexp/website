@@ -98,8 +98,8 @@ embedded and served.
 ## Authentication flow (high level)
 
 Authentication is handled by the **backend's provider registry** (Google,
-GitHub, generic OIDC — `auth.providers` in the backend config); the frontend
-never holds OAuth secrets.
+GitHub, generic OIDC: the sign-in providers stored in the database and managed
+in the admin area); the frontend never holds OAuth secrets.
 
 1. The sign-in page fetches `GET /api/v1/auth/providers` and renders a
    **provider picker** from whatever this deployment has enabled

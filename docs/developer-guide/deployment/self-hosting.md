@@ -57,7 +57,7 @@ instead, mount your own `config.yaml` over the baked path (there is a commented
 `volumes:` entry on the `app` service) — start from `backend/config.example.yaml`.
 
 Compose is optional: with a reachable pgvector-enabled PostgreSQL, a single
-`docker run -p 8080:8080 -e DB_HOST=... ghcr.io/vibexp/vibexp:0.10.0` works
+`docker run -p 8080:8080 -e DB_HOST=... ghcr.io/vibexp/vibexp:0.15.0` works
 anywhere. The image is multi-arch (`linux/amd64` + `linux/arm64`). See
 [Docker & Compose](docker.md) and the
 [Configuration Reference](configuration-reference.md).

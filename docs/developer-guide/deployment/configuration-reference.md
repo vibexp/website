@@ -40,9 +40,8 @@ Three files in the repo anchor the surface:
 :::caution[Env vars only work when the file references them]
 There is no generic environment override: an env var takes effect **only if the
 loaded `config.yaml` references it as `${VAR}`**. The baked Docker config wires
-the common knobs listed below; anything it does not reference (multi-provider
-`auth.providers` lists, `auth.oauth_as.*` token TTLs, and most tuning fields)
-requires mounting your own `config.yaml`.
+the common knobs listed below; anything it does not reference (`auth.oauth_as.*` token TTLs and most tuning
+fields) requires mounting your own `config.yaml`.
 :::
 
 ## Must-set production values
