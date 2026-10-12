@@ -69,7 +69,7 @@ A lock also stops a few indirect changes that would delete the resource or rewri
 
 - **Deleting or migrating a project** that contains a locked prompt, blueprint or artifact. A migration is refused whether or not the locked resource was among those selected.
 - **Deleting a custom artifact type** that a locked artifact uses.
-- **Deleting a custom status** that a locked prompt, blueprint or artifact carries.
+- **Deleting a [custom status](statuses.md#delete-a-status)** that a locked prompt, blueprint or artifact carries.
 
 Two things a lock does **not** stop:
 
