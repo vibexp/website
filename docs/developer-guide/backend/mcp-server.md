@@ -103,6 +103,11 @@ handles deletion across types — `resource_type` is one of `memory`,
 `artifact`, `blueprint`, or `prompt` — so the tool surface stays small instead
 of growing one delete tool per type.
 
+A single generic **`lock_resource`** tool (`vibexp_io_lock_resource`) does the
+same for locking across `prompt`, `blueprint` and `artifact`. It deliberately
+has no unlock counterpart: an agent can place a guard, only a person can remove
+one.
+
 For the public-facing server, tools follow the `vibexp_io_*` naming convention
 (for example `vibexp_io_create_prompt`, `vibexp_io_search`).
 

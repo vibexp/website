@@ -41,6 +41,8 @@ These three are not isolated: a resource can be marked `governed-by` the bluepri
 
 To edit, open a blueprint and choose **Edit**, make your changes, and save.
 
+A locked blueprint cannot be deleted, and some of its fields (slug, status, type, subtype, project, labels, metadata, path) are frozen until it is unlocked. See [Resource locking](resource-locking.md).
+
 The create and edit form includes a key-value metadata editor for adding or changing metadata pairs directly in the UI.
 
 To query blueprints by the metadata they carry, see [Metadata filtering](metadata-filtering.md). Blueprints also carry up to 10 free-form [labels](labels.md), filterable over the REST API with `?labels=`.
