@@ -51,8 +51,8 @@ Unlocking somebody else's lock is the `resource.unlock.any` permission in [Team 
 | | Frozen while locked | Still editable |
 | --- | --- | --- |
 | **Prompt** | slug, status, project, labels, MCP exposure (`mcp_expose`) | name, description, body, restoring a version |
-| **Blueprint** | slug, status, type, subtype, project, labels, metadata, path | title, description, content |
-| **Artifact** | slug, status, type, project, labels, metadata | title, description, content, attachments (upload and delete) |
+| **Blueprint** | slug, status, type, subtype, project, labels, metadata, path | title, description, content, restoring a version |
+| **Artifact** | slug, status, type, project, labels, metadata | title, description, content, restoring a version, attachments (upload and delete) |
 
 Sending a frozen field with the value it already has is not a change, so a client that always submits the whole resource keeps working as long as the frozen fields are untouched.
 
