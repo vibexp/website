@@ -36,6 +36,71 @@ in between.
 
 ## Breaking changes
 
+### Search ranking and AI summary defaults moved to Admin → Settings (v0.15.0)
+
+The instance-wide search ranking defaults and AI summary defaults are no longer
+read from `config.yaml`. They are stored in the database, and an instance admin
+edits them in the admin area under **Settings** → **Search** and **Settings** →
+**AI Summary**: see
+[Search & AI Summary Settings](search-and-ai-summary-settings.md). The `search:`
+and `ai_summary:` sections are **deprecated**, and so are the four environment
+variables that feed `ai_summary:` in the published image:
+
+`AI_SUMMARY_ENABLED`, `AI_SUMMARY_TOP_N`, `AI_SUMMARY_REQUEST_TIMEOUT`,
+`AI_SUMMARY_STYLE`.
+
+The published image has no `search:` section and no environment variables for
+it, so search values can only come from a `config.yaml` you mounted yourself.
+
+**What v0.15.0 does at startup.** Each section is handled on its own. The
+server compares the section's effective values with the built-in defaults and
+checks whether settings are already stored in the database:
+
+| Section's values | Nothing stored yet | Settings already stored |
+| --- | --- | --- |
+| Same as the built-in defaults | Nothing happens | Nothing happens |
+| Different from the built-in defaults | The section is imported, with an **Imported** entry in the page's change history | The section is ignored, with a warning in the log at every start |
+
+For an upgrading instance with tuned values, the import happens on the first
+start of v0.15.0, and the log line names the section. The check is made at
+every start, though, and it looks only at whether settings are stored. The
+import never stops the server from starting.
+
+Two details:
+
+- An invalid `ai_summary:` section logs an error, imports nothing, and leaves
+  the built-in defaults in effect. An invalid `search:` section still stops the
+  server at startup, as it did before.
+- `ai_summary.max_top_n` and `ai_summary.max_output_tokens_ceiling` are ignored
+  and never imported. A non-default value only logs a warning.
+
+**Teams are no longer capped by the instance.** Before v0.15.0, `max_top_n` and
+`max_output_tokens_ceiling` bounded what a team could choose for its own AI
+summary settings. They no longer bound anything: every team may choose up to
+**10** results and **32768** response tokens. If you set either key lower to
+cap your teams, that cap is gone and there is no replacement setting.
+
+**Who is affected:** instances with a `search:` or `ai_summary:` section that
+differs from the built-in defaults, including an instance that sets any of the
+four `AI_SUMMARY_*` variables to a non-default value. If you never changed
+these values, nothing is imported and nothing changes.
+
+**What to do:**
+
+1. Upgrade and start v0.15.0.
+2. As an instance admin, open **Settings** → **Search** and **Settings** →
+   **AI Summary** in the admin area and check the values. An imported page
+   shows the badge **Customized**.
+3. Remove the `search:` and `ai_summary:` sections from a mounted
+   `config.yaml`, and unset the four `AI_SUMMARY_*` variables. From now on,
+   change these values in the admin area.
+
+Do step 3 before the next minor release: both sections and the `AI_SUMMARY_*`
+variables are scheduled for removal there, and a leftover section is planned to
+stop the server from starting. Removing them now also avoids a surprise: while
+a non-default section remains, **Reset to defaults** on the matching admin page
+is undone at the next restart, because the section is imported again.
+
 ### Instance email moved to Admin → Settings → Email (v0.15.0)
 
 The provider your instance sends its own mail through (invitations,

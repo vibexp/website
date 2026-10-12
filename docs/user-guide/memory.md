@@ -207,7 +207,8 @@ similarity). When recency ranking is enabled, relevance is blended with how
 recently a memory was created or updated. Ranking is configurable **per
 team** on the team's Search Settings page (presets or advanced tuning of the
 relevance/created/updated weights and half-life), falling back to the
-instance defaults. Without an embedding provider, matching falls back to
+instance defaults an operator sets in the
+[admin area](self-hosting/search-and-ai-summary-settings.md). Without an embedding provider, matching falls back to
 keyword (full-text) search with typo tolerance.
 
 ### Manual Reference

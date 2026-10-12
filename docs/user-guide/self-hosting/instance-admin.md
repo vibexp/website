@@ -40,7 +40,7 @@ Instance admins get an **`/admin` portal** in the web app, reachable from the **
 
 All admin endpoints are `GET` requests. The portal cannot change any data.
 
-One exception: since v0.15.0 an instance admin also configures the instance's outbound mail, under **Settings** → **Email**: see [Instance Email](instance-email.md).
+One exception: since v0.15.0 an instance admin also configures the instance's outbound mail, under **Settings** → **Email**: see [Instance Email](instance-email.md). The same goes for the search ranking and AI summary defaults, under **Settings** → **Search** and **Settings** → **AI Summary**: see [Search & AI Summary Settings](search-and-ai-summary-settings.md).
 
 ## Not advertised to non-admins
 

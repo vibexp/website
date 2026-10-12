@@ -83,6 +83,41 @@ Model providers let a team bring its own OpenAI-compatible LLM endpoint.
 
 API keys are stored encrypted and can be updated or removed anytime.
 
+## AI Summary
+
+With a model provider in place, search can summarize its top results with it.
+The settings are a card on the same **Model Providers** page, below the
+providers. Until the team has at least one model provider the card only says
+that AI Summary needs one.
+
+| Field | What it does | Allowed |
+| --- | --- | --- |
+| **Enable AI Summary** | Summarize the top search results with this team's model. | on / off |
+| **Provider** | Which model provider writes the summary: **Team default** or a specific one. | any of the team's model providers |
+| **Style** | How detailed the summary is. | Concise, Balanced, Detailed |
+| **Results to read** | How many top-ranked results the summary reads. | 1–10 |
+| **Response length (tokens)** | Upper bound on how much the summary may write. | 1–32768 |
+
+Changing them needs the **Owner** or **Admin** role, like the providers
+themselves.
+
+A team either has its own complete AI summary profile or none at all:
+
+- **Using instance defaults**: the team has saved nothing, so it uses the
+  defaults its operator set, with **Team default** as the provider, and follows
+  along when the operator changes them.
+- **Customized for this team**: the team's saved values apply, and later
+  changes to the instance defaults no longer affect it.
+
+**Reset to defaults** drops the team's profile so it inherits again. It returns
+to whatever the instance defaults are at that moment.
+
+The limits of 10 results and 32768 tokens are fixed. Since v0.15.0 they are the
+same for every team and no instance setting narrows them. An operator still
+sets how much text of each result a summary reads and how long the server waits
+for the model, and those apply to every team: see
+[Search & AI Summary Settings](../self-hosting/search-and-ai-summary-settings.md).
+
 ## API access
 
 Both provider types have team-scoped REST endpoints:
@@ -100,7 +135,14 @@ DELETE     /api/v1/{team_id}/settings/embedding-providers/embeddings
 GET|POST   /api/v1/{team_id}/settings/model-providers
 GET|PUT|DELETE /api/v1/{team_id}/settings/model-providers/{id}
 POST       /api/v1/{team_id}/settings/model-providers/validate
+
+# AI summary settings
+GET|PUT|DELETE /api/v1/{team_id}/settings/ai-summary
 ```
+
+In the AI summary settings response, `max_top_n` and
+`max_output_tokens_ceiling` are deprecated: since v0.15.0 they always report
+the fixed limits, 10 and 32768.
 
 See [API Keys](api-keys.md) for authentication.
 
