@@ -325,9 +325,10 @@ instance provider is stored in the database and an instance admin edits it in
 the admin area, under Settings → Email: see
 [Instance Email](../../user-guide/self-hosting/instance-email.md).
 
-The keys below are read **once**, on the first start of v0.15.0, and only to
-import a populated section into the database when nothing is stored there yet.
-After that the section is ignored, and it is removed in the next minor release.
+The keys below are read at startup only to import a populated section into the
+database when nothing is stored there yet: for an upgrading instance, on the
+first start of v0.15.0. While a provider is stored the section is ignored, and
+it is removed in the next minor release.
 The exact rules are in the
 [upgrade note](../../user-guide/self-hosting/upgrading.md#instance-email-moved-to-admin--settings--email-v0150).
 :::

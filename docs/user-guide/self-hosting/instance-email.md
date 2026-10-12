@@ -60,8 +60,10 @@ The credential is stored encrypted with the instance's encryption key
 (`ENCRYPTION_KEY`) and is **never returned**, neither by the page nor by the
 API: both show only whether one is stored. When you edit a stored
 configuration, leave the credential field blank to keep the stored one.
-Switching to a different provider needs that provider's own credential; the old
-one is never carried over.
+Switching to Mailgun, Postmark or SendGrid needs that provider's own
+credential; switching to SMTP with the password left blank stores none (see
+[below](#smtp-relay-without-a-credential)). The old provider's credential is
+never carried over.
 
 ### Internal hosts are allowed
 
@@ -121,12 +123,12 @@ It also shows when mail was last delivered successfully and who last saved the
 configuration. After a failure followed by a successful send the state returns
 to **Healthy**, and the earlier error stays visible for diagnosis.
 
-Two more places warn an instance admin, on every page of the admin area:
+Two more places warn an instance admin:
 
-- A **banner**, "Instance email is not configured" or "The last instance email
-  send failed", with a **Configure email** link. It can be dismissed for the
-  rest of the browser session and is not shown on the Email page itself, which
-  already carries the status card.
+- A **banner** across the admin area, "Instance email is not configured" or
+  "The last instance email send failed", with a **Configure email** link. It
+  can be dismissed for the rest of the browser session and is not shown on the
+  Email page itself, which already carries the status card.
 - The **Instance email** card on the admin dashboard, reading **Configured**,
   **Not configured** or **Last send failed**.
 
@@ -148,6 +150,14 @@ A configuration imported from `config.yaml` during an upgrade appears here as
 that moment instance mail is discarded again until a provider is configured.
 Teams with their own provider are unaffected.
 
+:::caution[A leftover `email:` section brings it back]
+While the deprecated `email:` section or its environment variables are still
+populated, the server imports them again at the next start whenever nothing is
+stored. A removed configuration, credential included, therefore returns after a
+restart. Delete the section and the variables first: see
+[Upgrading from the `email:` config section](#upgrading-from-the-email-config-section).
+:::
+
 ## Instance and team providers
 
 Which provider carries a message is decided per message:
@@ -165,8 +175,9 @@ Support requests always use the instance provider. See
 
 Before v0.15.0 the instance provider was the `email:` section of `config.yaml`,
 set in the published image through `EMAIL_PROVIDER`, `SMTP_HOST` and the other
-email environment variables. That section is deprecated: v0.15.0 imports it into
-the database once, on the first start, and ignores it from then on.
+email environment variables. That section is deprecated: at startup v0.15.0
+imports it into the database when nothing is stored there yet, and ignores it
+whenever a provider is stored.
 
 → [Instance email moved to Admin → Settings → Email](upgrading.md#instance-email-moved-to-admin--settings--email-v0150)
 

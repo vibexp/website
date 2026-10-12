@@ -127,7 +127,7 @@ All disabled by default, enabled via env vars or a mounted `config.yaml` (see `b
 | Integration | Enable via | Behavior when off |
 | --- | --- | --- |
 | **Object storage** (attachments) | GCS-compatible storage: `GCS_RESOURCE_ATTACHMENTS_BUCKET` (+ `STORAGE_EMULATOR_HOST` for an emulator) | Uploads return `503` |
-| **Email** | Not an env var since v0.15.0: an instance admin configures SMTP, Mailgun, Postmark or SendGrid in the admin area under Settings → Email ([setup](instance-email.md)). The `EMAIL_PROVIDER` / `SMTP_*` env vars are deprecated and only imported once ([upgrade note](upgrading.md#instance-email-moved-to-admin--settings--email-v0150)) | Instance mail is discarded |
+| **Email** | Not an env var since v0.15.0: an instance admin configures SMTP, Mailgun, Postmark or SendGrid in the admin area under Settings → Email ([setup](instance-email.md)). The `EMAIL_PROVIDER` / `SMTP_*` env vars are deprecated and only imported at startup while nothing is stored ([upgrade note](upgrading.md#instance-email-moved-to-admin--settings--email-v0150)) | Instance mail is discarded |
 | **Analytics** | `VITE_GTM_ID` / `VITE_GA4_MEASUREMENT_ID` (Google Tag Manager / GA4). Setting `VITE_GTM_ID` **is** the opt-in; there is no separate enable flag, and VibeXP ships no cookie-consent gate of its own | No analytics |
 | **Private-network outbound calls** | `OUTBOUND_ALLOWED_CIDRS` (comma-separated, e.g. `172.16.0.0/12`) so the SSRF guard may reach a self-hosted embedding or model sidecar | Loopback and private destinations are refused |
 | **Telemetry** | `otel.*` in a mounted `config.yaml` (any OTLP collector) | No telemetry |

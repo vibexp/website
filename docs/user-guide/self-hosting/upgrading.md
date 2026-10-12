@@ -39,8 +39,8 @@ in between.
 ### Instance email moved to Admin → Settings → Email (v0.15.0)
 
 The provider your instance sends its own mail through (invitations,
-notifications, digests and support requests for every team without a provider
-of its own) is no longer read from `config.yaml`. It is stored in the database,
+notifications and digests for every team without a provider of its own, and all
+support requests) is no longer read from `config.yaml`. It is stored in the database,
 with its credential encrypted, and an instance admin edits it in the admin area
 under **Settings** → **Email**: see [Instance Email](instance-email.md). The
 `email:` section and the environment variables that feed it in the published
@@ -54,10 +54,12 @@ image are **deprecated**:
 environment variable and exist only in a mounted `config.yaml`; they are
 deprecated with the rest.
 
-**What the first start of v0.15.0 does.** If the database holds no instance
-provider yet and the section is populated, the server imports it once:
-provider, settings, sender address, contact recipient and the selected
-provider's credential. "Populated" means the section could actually have sent
+**What v0.15.0 does at startup.** If the database holds no instance provider
+and the section is populated, the server imports it: provider, settings, sender
+address, contact recipient and the selected provider's credential. For an
+upgrading instance that happens on the first start of v0.15.0. The check is
+made at every start, though, and it looks only at whether a provider is
+stored. "Populated" means the section could actually have sent
 mail:
 
 | `EMAIL_PROVIDER` | Imported when |
@@ -80,10 +82,16 @@ Only the credential of the selected provider is taken; a key set for another
 provider is left behind. None of this can stop the server: whatever goes wrong
 with the import is logged, and the instance starts with mail unconfigured.
 
-**Afterwards the database wins.** Once a provider is stored, by the import or
-by an admin, the section is ignored: changing `SMTP_HOST` and restarting no
-longer changes anything. While the section is still populated the server logs
-a deprecation warning on every start.
+**While a provider is stored, the database wins.** Whether it was stored by the
+import or by an admin, the section is ignored: changing `SMTP_HOST` and
+restarting no longer changes anything. While the section is still populated the
+server logs a deprecation warning on every start.
+
+**With nothing stored, the section is imported again.** That has two
+consequences. If the import was skipped for a missing from address, set
+`EMAIL_FROM_ADDRESS` and restart instead of retyping the form. And if an admin
+uses **Remove configuration** while the variables are still set, the next
+restart brings the old provider and its credential back.
 
 :::caution[Check that mail still works after the upgrade]
 An instance with no stored provider discards its mail without an error, so a
@@ -101,7 +109,8 @@ What to do after upgrading:
 3. Press **Send test email**. The message goes to your own account address.
 4. If nothing was imported, fill in the form on that page and save it.
 5. Remove the eleven environment variables above from your deployment, or the
-   `email:` section from a mounted `config.yaml`.
+   `email:` section from a mounted `config.yaml`. Until you do, a restart after
+   **Remove configuration** imports them again.
 
 `email.privacy_policy_url` is not carried over. v0.15.0 ignores the key and
 warns about it at startup; set the privacy policy link in the admin area's

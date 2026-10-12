@@ -107,7 +107,8 @@ Instance email is no longer one of them. Since v0.15.0 an instance admin
 configures it in the admin area, under Settings → Email (see
 [Instance Email](../../user-guide/self-hosting/instance-email.md)). The `email:`
 section and its environment variables (`EMAIL_PROVIDER`, `SMTP_*`, …) are
-deprecated: they are imported once and then ignored, as described in the
+deprecated: they are imported at startup while nothing is stored and ignored
+once a provider is, as described in the
 [upgrade note](../../user-guide/self-hosting/upgrading.md#instance-email-moved-to-admin--settings--email-v0150).
 
 → Full list: [Backend Configuration](../backend/configuration.md).
