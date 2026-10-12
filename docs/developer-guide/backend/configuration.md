@@ -37,8 +37,9 @@ own file over that path to take full control.
   service refuses to start otherwise. Generate one with `openssl rand -hex 16`
   (32 hex chars = 32 bytes).
 - Rate limits must be ≥ 1, retention windows must be in `1..3650` days,
-  search-ranking weights must be valid, and the OAuth-AS token lifespans must
-  be positive and ordered. All are validated at startup.
+  search-ranking weights must be valid (while the deprecated `search:` section
+  still loads), and the OAuth-AS token lifespans must be positive and ordered.
+  All are validated at startup.
 :::
 
 ## Interpolation grammar
@@ -260,15 +261,24 @@ built-in defaults.
 
 ## Search ranking
 
-When `recency_ranking_enabled` is `false` (default) results keep
-relevance-only ordering; `true` blends relevance and freshness by the weights.
-Weights must be non-negative and not all zero; the half-life and candidate cap
-must be positive (validated at startup).
+:::caution[Deprecated since v0.15.0]
+The `search:` section no longer sets the instance defaults. They are stored in
+the database and edited in the admin area, under **Settings** → **Search**: see
+[Search & AI Summary Settings](../../user-guide/self-hosting/search-and-ai-summary-settings.md).
+A section that differs from the built-in defaults is imported at startup when
+nothing is stored yet, and ignored otherwise. The section is scheduled for
+removal in the next minor release: see
+[Upgrading](../../user-guide/self-hosting/upgrading.md#search-ranking-and-ai-summary-defaults-moved-to-admin--settings-v0150).
+:::
 
-These are **instance defaults**: each team inherits them and can override them
-on its Search Settings page (Teams → Settings → Search) or via
-`/api/v1/{team_id}/settings/search`, except `search.rank_candidate_cap`, which
-is instance-only and never team-overridable.
+The keys below still load in v0.15.0, and only feed that import. Weights must
+be non-negative and not all zero; the half-life and candidate cap must be
+positive (still validated at startup).
+
+The values they import are **instance defaults**: each team inherits them and
+can override them on its Search Settings page (Teams → Settings → Search) or
+via `/api/v1/{team_id}/settings/search`, except the candidate cap, which is
+instance-only and never team-overridable.
 
 | Key | Default | Purpose |
 | --- | --- | --- |
@@ -278,6 +288,21 @@ is instance-only and never team-overridable.
 | `search.rank_weight_updated` | `0.2` | Weight of update recency. |
 | `search.rank_half_life_days` | `90.0` | Freshness decay half-life (max 36500). |
 | `search.rank_candidate_cap` | `200` | Re-rank candidate pool size (max 5000). |
+
+## AI summary
+
+:::caution[Deprecated since v0.15.0]
+The `ai_summary:` section, and the `AI_SUMMARY_ENABLED`, `AI_SUMMARY_TOP_N`,
+`AI_SUMMARY_REQUEST_TIMEOUT` and `AI_SUMMARY_STYLE` variables that feed it in
+the published image, no longer set the instance defaults. They are stored in
+the database and edited in the admin area, under **Settings** → **AI Summary**:
+see
+[Search & AI Summary Settings](../../user-guide/self-hosting/search-and-ai-summary-settings.md#ai-summary).
+The section is imported at startup under the same conditions as `search:`, and
+is scheduled for removal in the next minor release. `ai_summary.max_top_n` and
+`ai_summary.max_output_tokens_ceiling` are ignored and never imported. See
+[Upgrading](../../user-guide/self-hosting/upgrading.md#search-ranking-and-ai-summary-defaults-moved-to-admin--settings-v0150).
+:::
 
 ## Embeddings
 

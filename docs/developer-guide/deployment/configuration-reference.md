@@ -100,8 +100,16 @@ release stamps.
 ## Backend fields
 
 The backend has many more fields than the production-critical subset above
-(rate limits, retention, search ranking, telemetry, …). They
+(rate limits, retention, telemetry, …). They
 live in `config.yaml`; `config.example.yaml` documents every one.
+
+Search ranking and AI summary defaults are no longer among them. Since v0.15.0
+an instance admin sets them in the admin area, under Settings → Search and
+Settings → AI Summary (see
+[Search & AI Summary Settings](../../user-guide/self-hosting/search-and-ai-summary-settings.md)).
+The `search:` and `ai_summary:` sections are deprecated and only imported at
+startup (see
+[Upgrading](../../user-guide/self-hosting/upgrading.md#search-ranking-and-ai-summary-defaults-moved-to-admin--settings-v0150)).
 
 Instance email is no longer one of them. Since v0.15.0 an instance admin
 configures it in the admin area, under Settings → Email (see

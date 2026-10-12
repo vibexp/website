@@ -111,6 +111,8 @@ export const PAGES = [
     description: "Configure provider-agnostic login (Google, GitHub, or any OIDC provider) and the embedded OAuth 2.1 Authorization Server that secures the MCP endpoint for a self-hosted VibeXP." },
   { file: "user-guide/self-hosting/instance-admin.md", slug: "user-guide/self-hosting/instance-admin", label: "Instance Admin Portal", group: "selfhost",
     description: "Grant instance-wide operators a read-only admin portal on your self-hosted VibeXP for instance stats, users, and teams." },
+  { file: "user-guide/self-hosting/search-and-ai-summary-settings.md", slug: "user-guide/self-hosting/search-and-ai-summary-settings", label: "Search & AI Summary Settings", group: "selfhost",
+    description: "Set the instance-wide search ranking and AI summary defaults for your self-hosted VibeXP in Admin, Settings, Search and AI Summary: every field, team overrides, fixed limits, reset and change history." },
   { file: "user-guide/self-hosting/instance-email.md", slug: "user-guide/self-hosting/instance-email", label: "Instance Email", group: "selfhost",
     description: "Configure the email provider your self-hosted VibeXP instance sends invitations, notifications, digests and support requests through, in Admin, Settings, Email: providers, test sends, delivery health and change history." },
   { file: "user-guide/self-hosting/upgrading.md", slug: "user-guide/self-hosting/upgrading", label: "Upgrading", group: "selfhost",

@@ -53,7 +53,7 @@ Weights must be non-negative and not all zero, and the half-life must be greater
 
 A team either has **its own complete profile** or **none at all**; there is no per-field blend.
 
-- **No override**: the team inherits the deployment's defaults, and the page shows a **Using instance defaults** badge. If an operator changes those defaults, the team follows along.
+- **No override**: the team inherits the deployment's defaults, and the page shows a **Using instance defaults** badge. If an operator changes those defaults, the team follows along. Operators set them in the admin area: see [Search & AI Summary Settings](self-hosting/search-and-ai-summary-settings.md).
 - **Its own profile**: the team's saved values apply, and operator changes to the defaults no longer affect it.
 
 **Reset to defaults** drops the team's profile so it inherits again. Note that it returns you to whatever the instance default *is at that moment*, not to whatever it was when you first overrode it.
@@ -68,7 +68,7 @@ With recency ranking **off**, none of this applies: pagination runs against the 
 
 The Search Settings page shows your deployment's actual cap in the Advanced section. If you need to page deeper than that, either narrow the query or ask your operator to raise the cap.
 
-**The candidate cap is not team-configurable.** It is the one search knob that stays instance-only, because raising it increases memory and latency for *every* query on the deployment; one team must not be able to spend the whole instance's budget. Operators: see [Backend configuration](../developer-guide/backend/configuration.md).
+**The candidate cap is not team-configurable.** It is the one search knob that stays instance-only, because raising it increases memory and latency for *every* query on the deployment; one team must not be able to spend the whole instance's budget. Operators: since v0.15.0 it is set in the admin area, under **Settings** → **Search**. See [Search & AI Summary Settings](self-hosting/search-and-ai-summary-settings.md#search).
 
 ## It applies to your AI tools too
 
