@@ -36,6 +36,90 @@ in between.
 
 ## Breaking changes
 
+### Instance email moved to Admin → Settings → Email (v0.15.0)
+
+The provider your instance sends its own mail through (invitations,
+notifications and digests for every team without a provider of its own, and all
+support requests) is no longer read from `config.yaml`. It is stored in the database,
+with its credential encrypted, and an instance admin edits it in the admin area
+under **Settings** → **Email**: see [Instance Email](instance-email.md). The
+`email:` section and the environment variables that feed it in the published
+image are **deprecated**:
+
+`EMAIL_PROVIDER`, `EMAIL_FROM_ADDRESS`, `SMTP_HOST`, `SMTP_PORT`,
+`SMTP_USERNAME`, `SMTP_PASSWORD`, `MAILGUN_BASE_URL`, `MAILGUN_DOMAIN`,
+`MAILGUN_SENDING_KEY`, `POSTMARK_SERVER_TOKEN`, `SENDGRID_API_KEY`.
+
+`email.contact_recipient_address` and `email.postmark.message_stream` have no
+environment variable and exist only in a mounted `config.yaml`; they are
+deprecated with the rest.
+
+**What v0.15.0 does at startup.** If the database holds no instance provider
+and the section is populated, the server imports it: provider, settings, sender
+address, contact recipient and the selected provider's credential. For an
+upgrading instance that happens on the first start of v0.15.0. The check is
+made at every start, though, and it looks only at whether a provider is
+stored. "Populated" means the section could actually have sent
+mail:
+
+| `EMAIL_PROVIDER` | Imported when |
+| --- | --- |
+| `smtp` (the default) | host and port are set, and either a password is set or the host and port are not the built-in `smtp.gmail.com:587` |
+| `mailgun` | the sending domain and the sending key are set |
+| `postmark` | the server token is set |
+| `sendgrid` | the API key is set |
+
+Two cases import **nothing**, and leave the instance with no mail:
+
+- **Mail was never configured.** The published image defaults to
+  `smtp.gmail.com:587` with no password, which is not a working configuration,
+  so it is not imported.
+- **No usable from address.** The import needs `EMAIL_FROM_ADDRESS`, or an
+  `SMTP_USERNAME` that is itself an email address. With neither, the server
+  logs an error and imports nothing.
+
+Only the credential of the selected provider is taken; a key set for another
+provider is left behind. None of this can stop the server: whatever goes wrong
+with the import is logged, and the instance starts with mail unconfigured.
+
+**While a provider is stored, the database wins.** Whether it was stored by the
+import or by an admin, the section is ignored: changing `SMTP_HOST` and
+restarting no longer changes anything. While the section is still populated the
+server logs a deprecation warning on every start.
+
+**With nothing stored, the section is imported again.** That has two
+consequences. If the import was skipped for a missing from address, set
+`EMAIL_FROM_ADDRESS` and restart instead of retyping the form. And if an admin
+uses **Remove configuration** while the variables are still set, the next
+restart brings the old provider and its credential back.
+
+:::caution[Check that mail still works after the upgrade]
+An instance with no stored provider discards its mail without an error, so a
+failed or skipped import shows up as invitations that never arrive. Verify it
+rather than assuming it.
+:::
+
+What to do after upgrading:
+
+1. Sign in as an instance admin and open the admin area, then **Settings** →
+   **Email**. Configuring mail needs an instance admin: if you have none, set
+   `INSTANCE_ADMIN_EMAILS` first (see [Instance Admin Portal](instance-admin.md)).
+2. Check that the status card names your provider and that **Change history**
+   lists an **Imported from config.yaml** entry.
+3. Press **Send test email**. The message goes to your own account address.
+4. If nothing was imported, fill in the form on that page and save it.
+5. Remove the eleven environment variables above from your deployment, or the
+   `email:` section from a mounted `config.yaml`. Until you do, a restart after
+   **Remove configuration** imports them again.
+
+`email.privacy_policy_url` is not carried over. v0.15.0 ignores the key and
+warns about it at startup; set the privacy policy link in the admin area's
+**Site info** settings instead, then delete the key.
+
+The `email:` section will be removed in the next minor release, where a
+`config.yaml` that still contains it will stop the server from starting. Do
+step 5 before that upgrade.
+
 ### Prompt label filter now matches any label (v0.13.0)
 
 v0.13.0 changes what `?labels=` means on the prompt list endpoint,

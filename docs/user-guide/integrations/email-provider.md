@@ -4,9 +4,14 @@ Each team can bring its own email provider. Invitations, notifications, and
 the team's daily digest then go out through the team's account, from the
 team's own address, instead of the instance-wide provider.
 
-A team without its own provider **inherits the instance provider**; nothing
-breaks and no setup is required. Support mail always uses the instance
+A team without its own provider **inherits the
+[instance provider](../self-hosting/instance-email.md)**; nothing breaks and no
+setup is required on the team's side. Support mail always uses the instance
 provider regardless.
+
+If the team has no provider **and** the instance has none configured either,
+the team's mail is discarded: it is not queued, and no error is shown. An
+instance admin fixes that under Admin → Settings → Email.
 
 ## Configure a provider
 

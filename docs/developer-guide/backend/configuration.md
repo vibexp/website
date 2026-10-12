@@ -319,19 +319,36 @@ not in `config.yaml`.
 
 ## Email
 
+:::caution[Deprecated in v0.15.0]
+The `email:` section no longer configures instance mail. Since v0.15.0 the
+instance provider is stored in the database and an instance admin edits it in
+the admin area, under Settings → Email: see
+[Instance Email](../../user-guide/self-hosting/instance-email.md).
+
+The keys below are read at startup only to import a populated section into the
+database when nothing is stored there yet: for an upgrading instance, on the
+first start of v0.15.0. While a provider is stored the section is ignored, and
+it is removed in the next minor release.
+The exact rules are in the
+[upgrade note](../../user-guide/self-hosting/upgrading.md#instance-email-moved-to-admin--settings--email-v0150).
+:::
+
 | Key | Default | Purpose |
 | --- | --- | --- |
 | `email.provider` | `smtp` | `smtp`, `mailgun`, `postmark`, or `sendgrid`. |
-| `email.from_address` | `dev@vibexp.local` (example file) | Sender address for all providers. Empty falls back to `email.smtp.username`. |
-| `email.contact_recipient_address` | _(empty)_ | Inbox for support notification emails. Falls back to `from_address`, then `smtp.username`. |
-| `email.privacy_policy_url` | `https://example.com/privacy-policy` | Privacy-policy link in transactional email footers. |
+| `email.from_address` | `dev@vibexp.local` (example file) | Sender address for all providers. Empty falls back to `email.smtp.username` when that is itself an email address; with neither, nothing is imported. |
+| `email.contact_recipient_address` | _(empty)_ | Inbox for support notification emails. Empty uses the from address. |
+
+`email.privacy_policy_url` is gone: v0.15.0 ignores the key, logs a warning at
+startup while it is still set, and does not import it. The privacy policy link
+is part of the instance's site info now, set in the admin area.
 
 **SMTP** (`email.provider: smtp`). Dev defaults point at Mailpit (UI at
 `http://localhost:8025`).
 
 | Key | Dev default | Purpose |
 | --- | --- | --- |
-| `email.smtp.host` | `localhost` | SMTP host. When the host or port is absent the provider falls back to a no-op stub. |
+| `email.smtp.host` | `localhost` | SMTP host. Imported only when host and port are both set and either a password is set or the pair differs from the built-in default `smtp.gmail.com:587`. |
 | `email.smtp.port` | `1025` | SMTP port. |
 | `email.smtp.username` | `dev` | SMTP username. |
 | `email.smtp.password` | `${SMTP_PASSWORD}` | SMTP password (secret). |
@@ -357,12 +374,14 @@ not in `config.yaml`.
 | --- | --- |
 | `email.sendgrid.api_key` | `${SENDGRID_API_KEY}` — API key with the "Mail Send" permission (required). |
 
-The instance provider is also the **fallback** for teams without their own
-provider: each team can configure its own provider in the app (Teams →
-Settings → Email Provider; see [Email Provider](../../user-guide/integrations/email-provider.md)),
-and team credentials are stored encrypted with `security.encryption_key`, and
+The [instance provider](../../user-guide/self-hosting/instance-email.md) is
+also the **fallback** for teams without their own provider: each team can
+configure its own provider in the app (Teams → Settings → Email Provider; see
+[Email Provider](../../user-guide/integrations/email-provider.md)). Instance and
+team credentials are both stored encrypted with `security.encryption_key`, and
 rotating that key invalidates them. Support mail always uses the instance
-provider.
+provider. When neither a team provider nor an instance provider is configured,
+the mail is discarded.
 
 ## GitHub App
 
