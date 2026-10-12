@@ -74,16 +74,19 @@ Two details:
 - `ai_summary.max_top_n` and `ai_summary.max_output_tokens_ceiling` are ignored
   and never imported. A non-default value only logs a warning.
 
-**Teams are no longer capped by the instance.** Before v0.15.0, `max_top_n` and
-`max_output_tokens_ceiling` bounded what a team could choose for its own AI
-summary settings. They no longer bound anything: every team may choose up to
-**10** results and **32768** response tokens. If you set either key lower to
-cap your teams, that cap is gone and there is no replacement setting.
+**Teams are no longer capped by the instance.** Before v0.15.0, `max_top_n`
+(default 10) and `max_output_tokens_ceiling` (default 4096) bounded what a team
+could choose for its own AI summary settings. They no longer bound anything:
+every team may choose up to **10** results and **32768** response tokens. On an
+instance that never touched these keys, the limit on a team's response length
+therefore rises from 4096 to 32768 tokens. If you lowered either key to cap
+your teams, that cap is gone too. There is no replacement setting.
 
 **Who is affected:** instances with a `search:` or `ai_summary:` section that
 differs from the built-in defaults, including an instance that sets any of the
 four `AI_SUMMARY_*` variables to a non-default value. If you never changed
-these values, nothing is imported and nothing changes.
+these values, nothing is imported; the only change is the higher limit on a
+team's response length described above.
 
 **What to do:**
 
