@@ -40,6 +40,8 @@ Instance admins get an **`/admin` portal** in the web app, reachable from the **
 
 All admin endpoints are `GET` requests. The portal cannot change any data.
 
+Since v0.15.0 an instance admin also configures the instance's outbound mail, under **Settings** → **Email**: see [Instance Email](instance-email.md).
+
 ## Not advertised to non-admins
 
 The portal is invisible unless you hold the role:

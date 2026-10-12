@@ -29,6 +29,7 @@ Start here if you use VibeXP, or run it for your team.
 
 - [Open source](user-guide/open-source/README.md) - licensing and how the repositories are laid out.
 - [Self-hosting](user-guide/self-hosting/README.md) - run your own instance with Docker Compose.
+- [Instance email](user-guide/self-hosting/instance-email.md) - the provider your instance sends its own mail through.
 - [Upgrading](user-guide/self-hosting/upgrading.md) - the breaking changes to read before you pull a new image.
 
 ## Developer guide

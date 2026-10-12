@@ -62,7 +62,7 @@ local evaluation only.
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (or `GITHUB_*`, `OIDC_*`) | `auth.<provider>.*` | Credentials for the chosen provider (plus `*_REDIRECT_URI` if it differs from `<FRONTEND_BASE_URL>/api/v1/auth/callback`, and `OIDC_ISSUER_URL` for OIDC). |
 | `OAUTH_AS_ISSUER_URL` | `auth.oauth_as.issuer_url` | Public **HTTPS** URL enabling the embedded OAuth 2.1 Authorization Server (MCP tokens). |
 | `MCP_RESOURCE_URI` | `mcp.resource_uri` | Public MCP URL, the required token audience (RFC 8707), e.g. `https://<your-app-host>/mcp/v1/common`. |
-| `INSTANCE_ADMIN_EMAILS` | `auth.instance_admins` | Comma-separated emails granted the `/api/v1/admin` portal. Empty leaves the feature dormant. |
+| `INSTANCE_ADMIN_EMAILS` | `auth.instance_admins` | Comma-separated emails granted the `/api/v1/admin` portal. Empty leaves the feature dormant. Since v0.15.0 an instance admin is also required to configure the instance's outbound mail ([Instance Email](../../user-guide/self-hosting/instance-email.md)), so with this empty and no mail configured nobody can set it up. |
 | `AUTH_ALLOWED_DOMAINS` / `AUTH_ALLOWED_EMAILS` | `auth.access_allowlist.*` | Optional. Restrict sign-in by email domain and/or exact address (comma-separated). A user is allowed if either matches; both empty means open. |
 | `TRUSTED_PROXIES` | `server.trusted_proxies` | Set if you run behind a reverse proxy or load balancer. Comma-separated CIDRs allowed to assert a client IP via `X-Forwarded-For` / `X-Real-IP` (e.g. `10.0.0.0/8,172.16.0.0/12`; `192.168.1.5/32` for one host). Empty ignores those headers and uses the connecting peer, correct for a directly exposed instance. Left empty behind a proxy, per-IP rate limits collapse into one bucket and logs show the proxy address; the backend warns at startup. An invalid CIDR fails startup. |
 | `OUTBOUND_ALLOWED_CIDRS` | `security.outbound_allowed_cidrs` | Comma-separated CIDRs the SSRF guard may dial even though they are loopback or private. Empty (the default) refuses every reserved range, which is what blocks a self-hosted embedding or model sidecar on a private Docker subnet. Declare only the network your own service runs on (e.g. `172.16.0.0/12`, or `127.0.0.1/32` for a same-host Ollama). Link-local (`169.254.0.0/16`, `fe80::/10`, i.e. cloud metadata) and multicast (`224.0.0.0/4`, `ff00::/8`) can never be allowlisted; a malformed CIDR or one overlapping those ranges fails startup. Local development is exempt: a localhost `FRONTEND_BASE_URL` already permits reserved ranges. |
@@ -100,8 +100,15 @@ release stamps.
 ## Backend fields
 
 The backend has many more fields than the production-critical subset above
-(rate limits, retention, search ranking, email, telemetry, …). They
+(rate limits, retention, search ranking, telemetry, …). They
 live in `config.yaml`; `config.example.yaml` documents every one.
+
+Instance email is no longer one of them. Since v0.15.0 an instance admin
+configures it in the admin area, under Settings → Email (see
+[Instance Email](../../user-guide/self-hosting/instance-email.md)). The `email:`
+section and its environment variables (`EMAIL_PROVIDER`, `SMTP_*`, …) are
+deprecated: they are imported once and then ignored, as described in the
+[upgrade note](../../user-guide/self-hosting/upgrading.md#instance-email-moved-to-admin--settings--email-v0150).
 
 → Full list: [Backend Configuration](../backend/configuration.md).
 
