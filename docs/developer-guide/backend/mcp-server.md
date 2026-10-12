@@ -89,6 +89,8 @@ The MCP server exposes tools across these resource groups:
 - `relations` (the `link_resources` write tool, `vibexp_io_link_resources`)
 - `metadata` (the `list_resource_metadata` key/value discovery tool; the
   `metadata` filter parameter on `vibexp_io_list_resources`)
+- `statuses` (the `list_statuses` discovery tool, `vibexp_io_list_statuses`: a
+  team's built-in and custom statuses per resource type)
 - `feeds`
 - `search`
 - `attachments`

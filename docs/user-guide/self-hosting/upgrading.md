@@ -154,6 +154,57 @@ server will refuse to start while any of them is still set.
 If sign-in does not work after the upgrade, see
 [Lockout Recovery](lockout-recovery.md).
 
+### Status fields are open strings in the API clients (v0.15.0)
+
+v0.15.0 lets a team add [custom statuses](../statuses.md) to its prompts,
+artifacts, blueprints and memories, so the `status` of a resource is no longer
+one of a fixed list.
+
+**What changed.** In v0.14.0 the OpenAPI schemas `PromptStatus`,
+`ArtifactStatus`, `BlueprintStatus` and `MemoryStatus` were closed enums. In
+v0.15.0 each is a plain string of at most 50 characters. The two API clients,
+`@vibexp/api-client` and `github.com/vibexp/api-client-go`, are generated from
+that spec, so their releases built from the v0.15.0 spec type these four as
+plain strings too. In the Go client each is now an alias of `string`, with no
+status constants.
+
+**Who is affected.**
+
+- Code built on either API client that uses the generated status enum type or
+  its constants, or that switches exhaustively over it. It has to change when
+  you update the client: Go code that names a generated status constant no
+  longer compiles, and a switch that used to cover every value no longer does.
+- Any API consumer that assumes a response `status` is one of the old values,
+  whatever client it uses. Nothing differs until a team creates a custom
+  status; from then on a resource can come back with a value such as
+  `in-review`.
+
+**What to do.** Treat `status` as a string. Compare it against the values you
+care about and give every switch a default branch for the ones you do not know.
+To learn which statuses a team has, and which of them are live, call
+`GET /api/v1/{team_id}/statuses?resource_type=<type>`.
+
+Requests are not loosened by this: a `status` the team does not have is still
+rejected with `400`, on writes and on list filters.
+
+### Prompts in any status except draft can be exposed over MCP (v0.15.0)
+
+**What changed.** v0.14.0 exposed a prompt over MCP only when its status was
+`published` and **Available in MCP** (`mcp_expose`) was on. v0.15.0 exposes
+every prompt that is **not a `draft`** and has `mcp_expose` on, both as a
+native MCP prompt and through `vibexp_io_render_prompt`.
+
+**Who is affected.** Nobody on the day of the upgrade: until a team adds a
+custom prompt status, every prompt is `draft` or `published`, and those two
+behave as before. It starts to matter the first time a team gives a prompt a
+[custom status](../statuses.md). A prompt in a status such as `in-review` or
+`deprecated` is served to connected MCP clients like a published one, because a
+custom status is always live.
+
+**What to do.** If your team used "not published" to mean "not visible to AI
+tools", keep such prompts in `draft`, or turn **Available in MCP** off on them.
+A custom status does not hide a prompt.
+
 ### Search ranking and AI summary defaults moved to Admin → Settings (v0.15.0)
 
 The instance-wide search ranking defaults and AI summary defaults are no longer

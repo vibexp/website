@@ -32,6 +32,8 @@ VibeXP is accessible via web browser on your deployed VibeXP app (your own VibeX
 
 **Published**: Finalized prompts that are ready for use. Published prompts are more stable for MCP integration and team sharing.
 
+Your team can also add [custom statuses](../statuses.md) for prompts, such as "In review".
+
 You can change status at any time. The choice helps you organize your library and distinguish between stable templates and experiments.
 
 ### Can I use HTML in prompts?
@@ -107,7 +109,7 @@ No. MCP is optional. You can use prompts by copying them to any AI tool. MCP jus
 ### Why aren't my MCP-enabled prompts showing up in my tool?
 
 Check that:
-1. The prompt status is Published (only published prompts can be exposed over MCP)
+1. The prompt is not a draft (a draft is never exposed over MCP; any other status is) and **Available in MCP** is on
 2. Your MCP server is configured correctly in the tool
 3. Your MCP client completed the OAuth connect flow (paste `https://<your-mcp-host>/mcp/v1/common`; API keys are rejected with 401)
 4. The tool's MCP client is connected to VibeXP

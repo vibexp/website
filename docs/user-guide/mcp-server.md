@@ -23,7 +23,7 @@ Model Context Protocol (MCP) is an open standard that enables AI applications to
 VibeXP implements MCP to expose your data through **tools** and **prompts**:
 
 - **Tools**: Actions AI can perform — search, create, update, and delete your prompts, artifacts, blueprints, memories, feeds, and attachments (see [Available Tools](#available-tools))
-- **Prompts**: Your published prompts marked **Available in MCP** appear as native MCP prompts, so connected clients can list them and render them with their placeholder arguments
+- **Prompts**: Your prompts marked **Available in MCP** that are not drafts appear as native MCP prompts, so connected clients can list them and render them with their placeholder arguments
 
 VibeXP does not expose MCP "resources" — all reads and writes go through tools, and prompt templates are additionally served as MCP prompts.
 
@@ -223,6 +223,7 @@ Tools that read or write team data require a `team_id` (UUID or slug) argument. 
 - **vibexp_io_search**: Semantic search across a team's prompts, artifacts, blueprints, and memories — find knowledge by meaning, optionally narrowed by type or project
 - **vibexp_io_get_resource**: Fetch a single resource with its full content, keyed by `resource_type` — a `memory` by `id`, or an `artifact`/`blueprint` by `project_id` and `slug`
 - **vibexp_io_list_resources**: List a project's resources of one `resource_type` (`memory`, `artifact`, or `blueprint`) as slim items, filterable (status, type, text search, metadata) and paginated; call `vibexp_io_get_resource` for a single item's full content. The `metadata` parameter takes a JSON object of key to array of string values: keys are combined with AND, values within a key with OR, and an empty array means "the key exists"
+- **vibexp_io_list_statuses**: List the statuses a team can use on its prompts, artifacts, blueprints, and memories: the built-in statuses first, then the team's custom ones. Parameters: `team_id` (required) and `resource_type` (optional: `prompt`, `artifact`, `blueprint`, or `memory`; omit it to get all four). Returns `statuses[]`, each with `resource_type`, `slug`, `name`, `is_system`, and `is_live`. The `slug` is the value to pass as `status`; call this before setting or filtering by a status. An unknown `status` on a create or update tool, or on `vibexp_io_list_resources`, returns an error that lists the allowed values. See [Statuses](statuses.md)
 - **vibexp_io_list_resource_metadata**: Discover the metadata keys and values a team actually uses, so a metadata filter can be built from real data instead of guesses. Omit `key` to list the distinct metadata keys for a `resource_type` (`memory`, `artifact`, or `blueprint`); supply `key` to list that key's distinct values. Every value returned works directly in the `metadata` filter of `vibexp_io_list_resources`
 
 One generic pair of read tools covers memories, artifacts, and blueprints (keyed by `resource_type`), mirroring `vibexp_io_delete_resource`.
@@ -241,7 +242,7 @@ Edges an AI creates are recorded as **suggested** for `governed-by` and `superse
 
 - **vibexp_io_create_prompt**: Create a new prompt
 - **vibexp_io_update_prompt**: Update an existing prompt
-- **vibexp_io_render_prompt**: Render a published, MCP-exposed prompt by slug, substituting values for its `{{placeholders}}` — returns the rendered body
+- **vibexp_io_render_prompt**: Render an MCP-exposed prompt that is not a draft by slug, substituting values for its `{{placeholders}}` — returns the rendered body
 
 To *read* prompts, use `vibexp_io_render_prompt`, the generic `vibexp_io_search` tool, or the native MCP prompts your client lists (see the note below).
 
@@ -261,7 +262,7 @@ Read blueprints with the generic `vibexp_io_get_resource` / `vibexp_io_list_reso
 
 ### Memory Operations
 
-- **vibexp_io_create_memory**: Store a new memory with text, metadata, labels, and an optional lifecycle status (`active`, `draft`, `archived`)
+- **vibexp_io_create_memory**: Store a new memory with text, metadata, labels, and an optional lifecycle status (`active`, `draft`, `archived`, or a [custom status](statuses.md) of the team)
 - **vibexp_io_update_memory**: Update a memory's text, status, metadata, or labels
 
 Read memories with the generic `vibexp_io_get_resource` / `vibexp_io_list_resources` tools (`resource_type: memory`).
@@ -298,7 +299,7 @@ One generic tool covers all four deletable resource types. Pass `resource_type` 
 Deleting a resource also removes its search embeddings, and deleting an artifact removes its attachments.
 
 :::note[Prompts are also native MCP prompts]
-Beyond the tools above, your **published** prompts marked **Available in MCP** are exposed as native MCP prompts. Clients that support MCP prompts (such as Claude Code) can list them by name (the prompt's slug), see their placeholder arguments, and render them with values filled in.
+Beyond the tools above, your prompts marked **Available in MCP** are exposed as native MCP prompts, unless they are drafts: a prompt in any other status, **Published** or one of the team's [custom statuses](statuses.md), is exposed. Clients that support MCP prompts (such as Claude Code) can list them by name (the prompt's slug), see their placeholder arguments, and render them with values filled in.
 :::
 
 ## Usage Examples

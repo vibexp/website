@@ -127,10 +127,12 @@ Every memory has a lifecycle **status** that controls where it appears:
 - **draft** — a work in progress. Drafts appear in default memory lists so you can keep refining them, but they are **never returned by search**, so AI tools won't pick them up as context.
 - **archived** — retired. Archived memories are hidden from default lists and from search, but remain reachable when you filter the list by the `archived` status explicitly.
 
+These three are the built-in statuses. Your team can add custom memory statuses next to them; a custom status behaves like **active** in lists and search. See [Statuses](statuses.md).
+
 ### Changing a Memory's Status
 
 - **In the app** — the memory create/edit form includes a status selector, each memory shows a status badge in the list and detail views, and the memory list has a status filter (including "All statuses") so you can find drafts and archived memories.
-- **Over MCP** — `vibexp_io_create_memory` and `vibexp_io_update_memory` both accept a `status` parameter (`active`, `draft`, or `archived`), so connected AI tools can, for example, park an unconfirmed fact as a draft or archive an outdated one.
+- **Over MCP** — `vibexp_io_create_memory` and `vibexp_io_update_memory` both accept a `status` parameter (`active`, `draft`, `archived`, or a custom status of the team), so connected AI tools can, for example, park an unconfirmed fact as a draft or archive an outdated one.
 
 :::tip
 Prefer archiving over deleting: an archived memory stops influencing search and AI context but stays available if you need it back.

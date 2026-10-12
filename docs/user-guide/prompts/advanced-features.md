@@ -305,11 +305,11 @@ MCP (Model Context Protocol) is a standard that allows AI applications to access
 ### Enabling MCP Access
 
 1. Edit your prompt
-2. Set the prompt's status to **Published** — the toggle only appears for published prompts
+2. Set the prompt's status to anything except **Draft** (**Published**, or one of your team's [custom statuses](../statuses.md)): the toggle is not available on a draft
 3. In the Settings panel, turn on **Available in MCP**
 4. Save the prompt
 
-The **Available in MCP** toggle controls whether the prompt is exposed to connected MCP clients as a native MCP prompt. Only **published** prompts can be exposed — switching a prompt back to draft turns the toggle off automatically.
+The **Available in MCP** toggle controls whether the prompt is exposed to connected MCP clients as a native MCP prompt. A prompt in any status except **Draft** can be exposed. Switching a prompt back to draft turns the toggle off automatically.
 
 ### Using MCP-Enabled Prompts
 
@@ -325,14 +325,14 @@ Over MCP, connected AI agents can work with your prompt library in three ways:
 
 - **Create and update prompts** — the `vibexp_io_create_prompt` and `vibexp_io_update_prompt` tools let agents write to your prompt library.
 - **Find prompt content** — the generic `vibexp_io_search` tool searches your prompts (alongside artifacts, blueprints, and memories) by meaning; narrow it to prompts with the `types` filter.
-- **List and render exposed prompts** — published prompts with **Available in MCP** enabled are served as native MCP prompts, with placeholder resolution handled by VibeXP. The most recently updated of these are exposed as native prompt primitives (slash commands); agents can render any exposed prompt on demand — including ones beyond that set — with the `vibexp_io_render_prompt` tool by passing its `slug` and placeholder values.
+- **List and render exposed prompts** — prompts that are not drafts and have **Available in MCP** enabled are served as native MCP prompts, with placeholder resolution handled by VibeXP. The most recently updated of these are exposed as native prompt primitives (slash commands); agents can render any exposed prompt on demand — including ones beyond that set — with the `vibexp_io_render_prompt` tool by passing its `slug` and placeholder values.
 
 There are no dedicated prompt read tools — reading goes through search or the native MCP prompts.
 
 ### Best Practices for MCP Prompts
 
-**Publish prompts you want exposed**
-Only published prompts can be made available in MCP — moving a prompt back to draft removes it from connected clients.
+**Move prompts you want exposed out of draft**
+A draft cannot be made available in MCP, and moving a prompt back to draft removes it from connected clients. Any other status works, including a custom one.
 
 **Use clear, unique names**
 Tool users will see prompt names in selection lists. Make them descriptive and distinguishable.

@@ -11,7 +11,7 @@ A blueprint is a piece of structured guidance: coding standards, architectural r
 - **Project**: the grouping a blueprint belongs to (blueprints are addressed by project + slug).
 - **Content**: the body of the blueprint (supports Markdown).
 - **Description**: an optional short summary.
-- **Status**: `active` or `expired` (archive without deleting).
+- **Status**: `active` or `expired` (archive without deleting), or one of your team's custom statuses: see [Statuses](statuses.md).
 - **Metadata**: optional custom key/value fields.
 - **Path**: the canonical repo-relative path the blueprint maps to (for example `.claude/skills/deploy/SKILL.md` or `CLAUDE.md`). Derived server-side from the blueprint's type and subtype for VibeXP-authored blueprints, or the verbatim source path for imported ones. Display-only. See [Blueprint paths](#blueprint-paths).
 - **Type and subtype**: which AI tool and category the blueprint targets (Claude Code, Cursor, Codex, and the Agent Skills category).
