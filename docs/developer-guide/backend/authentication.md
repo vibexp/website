@@ -15,35 +15,52 @@ lives in `internal/auth`, split into focused subpackages:
 For the keys referenced here, see
 [Configuration → Authentication](configuration.md#authentication).
 
-## Identity providers (the config-driven registry)
+## Identity providers (stored in the database)
 
-Web login is driven by a **provider registry** built at startup from
-`auth.providers` — a list of provider names to enable **simultaneously**:
+Web login is driven by the provider rows in the `instance_auth_providers`
+table, which an instance admin edits under **Settings** → **Authentication** in
+the admin area. Each row has a type, a slug, a display name, a client ID, an
+encrypted client secret, an enabled flag and a sort order:
 
-- **`google`** — Google OIDC, reached directly via `accounts.google.com`
-  discovery. Configure `auth.google.client_id`, `auth.google.client_secret`
-  (via `${GOOGLE_CLIENT_SECRET}`), and `auth.google.redirect_uri`.
-- **`github`** — GitHub OAuth2 (not OIDC; claims come from the GitHub REST
-  API). Configure the `auth.github.*` block.
-- **`oidc`** — any generic, OIDC-compliant issuer (Keycloak, Authentik,
-  Zitadel, Auth0, …). Configure the `auth.oidc.*` block;
-  `auth.oidc.issuer_url` drives `/.well-known/openid-configuration` discovery.
+- **`google`**: Google OIDC, reached directly via `accounts.google.com`
+  discovery. At most one row.
+- **`github`**: GitHub OAuth2 (not OIDC; claims come from the GitHub REST
+  API). At most one row.
+- **`oidc`**: any generic, OIDC-compliant issuer (Keycloak, Authentik,
+  Zitadel, Auth0, …). Any number of rows, each with its own issuer URL, which
+  drives `/.well-known/openid-configuration` discovery.
 
-Names are matched **case-insensitively**. An empty list disables web login
-entirely (dev login still works). The single-value `auth.provider` key remains
-as a backward-compatible shim, used only when `auth.providers` is empty.
+A resolver builds the enabled providers from those rows and caches the result
+against a shared settings version, so a change made in the admin area is picked
+up by every replica on the next sign-in, with no restart. Every provider uses
+the same callback, derived from `frontend.base_url`:
+`<frontend.base_url>/api/v1/auth/callback` (or
+`http://localhost:<server.port>/api/v1/auth/callback` in local development).
 
-The enabled set is exposed at **`GET /api/v1/auth/providers`**, which returns
-each provider's canonical name plus a display label (`Google`, `GitHub`,
-`Single Sign-On`) — the frontend login screen renders its provider picker from
-this response rather than hardcoding a list.
+The enabled, successfully built set is exposed at
+**`GET /api/v1/auth/providers`**, which the frontend login screen renders its
+provider picker from, rather than hardcoding a list. A sign-in starts at
+`GET /api/v1/auth/login?provider=<slug>`.
+
+While no provider is enabled the instance is in **setup mode**: the server
+logs a one-time `SETUP URL` at startup, and its token is exchanged for a short
+setup session that can reach the provider and allowlist settings only. See
+[First-run setup](../../user-guide/self-hosting/authentication.md#first-run-setup).
 
 :::caution[Misconfiguration is non-fatal]
-An unknown name in `auth.providers`, a provider with missing credentials, or
-failed OIDC discovery against a bad issuer logs a **warning** and skips that
-provider — the backend still boots with whatever subset initialized. Web login
-for the skipped provider is simply absent from the picker. The exception: a
-non-empty but invalid GitHub App private key fails fast at startup.
+A provider that cannot be built, for example after failed OIDC discovery
+against a bad issuer, is left out of the picker and reported as **Unhealthy**
+in the admin area; the backend still boots and the other providers keep
+working.
+:::
+
+:::note[The `config.yaml` provider keys are deprecated]
+Up to v0.14 the registry was built at startup from `auth.providers` (or the
+single-value `auth.provider`) and the `auth.google`, `auth.github` and
+`auth.oidc` blocks. Since v0.15.0 those keys are only imported into the
+database at startup while no provider is stored, and are otherwise ignored;
+a per-provider `redirect_uri` is ignored altogether. See the
+[upgrade note](../../user-guide/self-hosting/upgrading.md#sign-in-providers-and-the-access-allowlist-moved-to-the-database-v0150).
 :::
 
 ## Sessions
@@ -69,46 +86,51 @@ detected as local development — `frontend.base_url` pointing at `localhost` or
 `127.0.0.1`. The detection is fail-closed (an empty value counts as
 production), so the flag has no effect in real deployments even if left on.
 
-## Sign-in allow-list
+## Sign-in allowlist
 
-`auth.access_allowlist` restricts who may sign in, by email domain and/or exact
-address. When both lists are empty (the default), registration is open: anyone
-can sign in.
-
-```yaml
-auth:
-  access_allowlist:
-    domains:
-      - example.com
-    emails:
-      - alice@other.com
-```
+The access allowlist restricts who may use the instance, by email domain and/or
+exact address. It is stored in the database (`instance_auth_allowlist`) and
+edited under **Settings** → **Authentication** in the admin area. When both
+lists are empty (the default), access is open: anyone the providers accept can
+sign in.
 
 Rules:
 
 - A user is allowed if **either** list matches.
-- `domains` matches the part after the last `@` **exactly** (case-insensitive):
+- A domain matches the part after the last `@` **exactly** (case-insensitive):
   `a@sub.example.com` does not match domain `example.com`.
-- `emails` matches the full address exactly.
-- When the allow-list is active, sign-in also requires a **provider-verified**
+- An email entry matches the full address exactly.
+- When the allowlist is active, sign-in also requires a **provider-verified**
   email. An unverified IdP account is denied even if its claimed address is
   listed.
+- Root instance admins (`auth.instance_admins`) are exempt from the lists.
+  Admins granted in the database are not.
 
-The MCP OAuth consent-attach re-check uses the same matcher, so an established
-identity is re-validated against the allow-list.
+The allowlist is enforced at sign-in, at the MCP OAuth consent-attach re-check,
+and on every authenticated request of a signed-in user, so tightening it takes
+effect within seconds and without a restart.
+
+The `auth.access_allowlist` key in `config.yaml` is deprecated: since v0.15.0
+it is only imported at startup while no allowlist is stored.
 
 ## Instance admins
 
-`auth.instance_admins` lists the emails designated as instance administrators
-(matched case-insensitively). It is exposed as `is_instance_admin` on
-`GET /api/v1/auth/me` and unlocks the `/api/v1/admin` portal, which is guarded by
-instance-admin middleware. Empty (the default) leaves the feature dormant.
+An instance admin is either a **root admin**, listed in `auth.instance_admins`
+(matched case-insensitively), or an admin **granted in the database** by a root
+admin. Both are exposed as `is_instance_admin` on `GET /api/v1/auth/me` and
+unlock the `/api/v1/admin` portal, which is guarded by instance-admin
+middleware; `is_root_instance_admin` on the same response marks a root admin.
+Only a root admin may grant or revoke the role, and a root admin cannot be
+suspended, deleted or revoked. With no root admin and no grant, the feature is
+dormant.
 
 ```yaml
 auth:
   instance_admins:
     - admin@example.com
 ```
+
+See [Instance Admin Portal](../../user-guide/self-hosting/instance-admin.md).
 
 ## API keys
 

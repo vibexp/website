@@ -147,31 +147,37 @@ localhost `frontend.base_url` already permits reserved destinations.
 
 ## Authentication
 
-Selects and configures the web-login identity providers. See
-[Authentication](authentication.md) for the full model.
+Session, dev-login, recovery and root-admin settings. The web-login identity
+providers and the access allowlist are stored in the database since v0.15.0 and
+edited in the admin area; the keys marked deprecated below are only imported at
+startup while nothing is stored. See [Authentication](authentication.md) for
+the full model.
 
 | Key | Default | Purpose |
 | --- | --- | --- |
-| `auth.providers` | `[]` | Web-login providers to enable **simultaneously**: any of `google`, `github`, `oidc` (case-insensitive). Empty disables web login (dev login still works). Takes precedence over `auth.provider`. |
-| `auth.provider` | _(empty)_ | Backward-compatible single-provider shim; used only when `auth.providers` is empty. |
+| `auth.providers` | `[]` | **Deprecated since v0.15.0** (imported at startup while no provider is stored, otherwise ignored). Web-login providers to enable **simultaneously**: any of `google`, `github`, `oidc` (case-insensitive). Empty disables web login (dev login still works). Takes precedence over `auth.provider`. |
+| `auth.provider` | _(empty)_ | **Deprecated since v0.15.0**, like `auth.providers`. Backward-compatible single-provider shim; used only when `auth.providers` is empty. |
 | `auth.session_encryption_key` | `${SESSION_ENCRYPTION_KEY}` | Hex secret (**64 hex chars = 32 bytes**) backing the AES-256-GCM session cookie and the OAuth state HMAC. Empty disables cookie session auth. Generate with `openssl rand -hex 32`. |
 | `auth.dev_login_enabled` | `false` when unset (the shipped `config.example.yaml` and baked Docker config set `true`) | Gates `/api/v1/auth/dev/login`. Effective only when `true` **and** the environment is detected as local development. |
-| `auth.access_allowlist.domains` | `[]` | Allowed email domains (matched exactly against the part after the last `@`). |
-| `auth.access_allowlist.emails` | `[]` | Allowed exact email addresses. A user may sign in if **either** list matches; both empty means open registration. While active, sign-in also requires a provider-verified email (unverified accounts are denied). |
-| `auth.instance_admins` | `[]` | Emails designated as instance administrators. Drives `is_instance_admin` and the `/api/v1/admin` portal; matched case-insensitively and validated as emails at startup. |
+| `auth.access_allowlist.domains` | `[]` | **Deprecated since v0.15.0** (imported at startup while no allowlist is stored, otherwise ignored). Allowed email domains (matched exactly against the part after the last `@`). |
+| `auth.access_allowlist.emails` | `[]` | **Deprecated since v0.15.0**, like `domains`. Allowed exact email addresses. A user may sign in if **either** list matches; both empty means open registration. While active, sign-in also requires a provider-verified email (unverified accounts are denied). |
+| `auth.recovery_mode` | `false` | Break-glass after an authentication lockout: forces setup mode on and logs a new one-time `SETUP URL` on every start, while the stored providers keep working. Wired to `AUTH_SETTINGS_RECOVERY_MODE` in the Docker config. |
+| `auth.instance_admins` | `[]` | Emails designated as **root** instance administrators; further admins are granted in the admin area. Drives `is_instance_admin` and the `/api/v1/admin` portal; matched case-insensitively and validated as emails at startup. |
 
 :::caution
-Provider misconfiguration is never fatal: an unknown name in `auth.providers`,
-missing credentials, or failed OIDC discovery logs a **warning** and skips that
-provider — the backend still boots. The enabled set is exposed at
+Provider misconfiguration is never fatal: a stored provider that cannot be
+built (failed OIDC discovery, say) is skipped and reported as unhealthy in the
+admin area, and the backend still boots. The enabled set is exposed at
 `GET /api/v1/auth/providers` for the login UI's provider picker.
 :::
 
-### Per-provider blocks
+### Per-provider blocks (deprecated)
 
-Each provider has its own block; set the secret in `.env` and the rest in
-`config.yaml`. All redirect URIs default to
-`http://localhost:8080/api/v1/auth/callback`.
+**Deprecated since v0.15.0.** These blocks are read only by the startup import:
+an enabled, complete provider is copied into the database while no provider is
+stored, and the block is ignored from then on. The `redirect_uri` values are
+not used at all: every provider redirects to
+`<frontend.base_url>/api/v1/auth/callback`.
 
 | Key | Purpose |
 | --- | --- |

@@ -36,6 +36,124 @@ in between.
 
 ## Breaking changes
 
+### Sign-in providers and the access allowlist moved to the database (v0.15.0)
+
+The sign-in providers (Google, GitHub, OIDC) and the access allowlist are no
+longer read from `config.yaml`. They are stored in the database, with each
+client secret encrypted, and an instance admin edits them in the admin area
+under **Settings** → **Authentication**: see
+[Authentication & MCP Auth](authentication.md). A change there applies with no
+restart. The `auth.providers`, `auth.provider`, `auth.google`, `auth.github`,
+`auth.oidc` and `auth.access_allowlist` keys are **deprecated**.
+
+**If you run the published image with environment variables**, which is the
+usual Docker and Docker Compose setup, these are the variables that feed those
+keys, and all of them are deprecated:
+
+`AUTH_PROVIDER`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
+`GOOGLE_REDIRECT_URI`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`,
+`GITHUB_REDIRECT_URI`, `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`,
+`OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI`, `AUTH_ALLOWED_DOMAINS`,
+`AUTH_ALLOWED_EMAILS`.
+
+These stay exactly as they are: `INSTANCE_ADMIN_EMAILS`,
+`SESSION_ENCRYPTION_KEY`, `ENCRYPTION_KEY`, `OAUTH_AS_ISSUER_URL`,
+`MCP_RESOURCE_URI` and `FRONTEND_BASE_URL`. A multi-provider list set as
+`auth.providers` in a mounted `config.yaml` is handled the same way as
+`AUTH_PROVIDER`.
+
+**What v0.15.0 does at startup.** Providers and the allowlist are handled
+separately, and you do not have to do anything for sign-in to keep working:
+
+- **Providers.** If the database holds no provider, the server imports every
+  provider that was enabled (named in `AUTH_PROVIDER` or `auth.providers`) and
+  complete (a client ID and a client secret, plus the issuer URL for OIDC).
+  Each keeps its name as its slug (`google`, `github`, `oidc`) and the label it
+  had on the sign-in page, so the sign-in page does not change. The set is
+  stored all at once or not at all. A provider that is not imported is logged
+  at `WARN` as `A config.yaml auth provider was not imported`, with the reason:
+  for example credentials set for a provider that was not enabled, or a
+  missing secret.
+- **Allowlist.** If the database holds no allowlist, the server imports
+  `AUTH_ALLOWED_DOMAINS` and `AUTH_ALLOWED_EMAILS`. An entry that is not a
+  valid domain or email address is dropped and logged, and the rest is kept.
+  If no entry is valid, nothing is imported, the server logs an error, and
+  sign-in is open to everyone the providers accept.
+
+For an upgrading instance this happens on the first start of v0.15.0. Nothing
+in the import can stop the server: a failure is logged and the instance starts
+with what is stored.
+
+**While something is stored, the database wins.** The variables are ignored:
+changing `GOOGLE_CLIENT_SECRET` or `AUTH_ALLOWED_DOMAINS` and restarting no
+longer changes anything. While any of them is still set, the server logs a
+deprecation warning on every start, one per key, beginning
+`config key "auth.provider" is deprecated`.
+
+**With nothing stored, the variables are imported again.** The check is made
+at every start, and it looks only at whether a provider (or an allowlist) is
+stored. So if an admin deletes every provider, or uses **Reset to open
+access** on the allowlist, while the variables are still set, the next restart
+brings the old values back. The same goes for an allowlist removed with the
+`allowlist clear` recovery command.
+
+**The redirect URI is no longer configurable.** Every provider now redirects
+to `<FRONTEND_BASE_URL>/api/v1/auth/callback`, and `GOOGLE_REDIRECT_URI`,
+`GITHUB_REDIRECT_URI` and `OIDC_REDIRECT_URI` are ignored. Earlier releases sent
+whatever those variables held. If the value you had set is anything other than
+`<FRONTEND_BASE_URL>/api/v1/auth/callback`, the provider's console is
+registered with an address VibeXP no longer uses, and it will refuse every
+sign-in after the upgrade. The server logs a `WARN` naming the provider and
+both addresses when it sees this, but by then sign-in is already failing.
+
+**The allowlist is now enforced on every request, not only at sign-in.** A
+signed-in user whose address no longer matches is signed out on their next
+request. Root admins (`INSTANCE_ADMIN_EMAILS`) are always allowed; see
+[Restricting who can sign in](authentication.md#restricting-who-can-sign-in-optional).
+
+**A new instance needs none of these variables.** With no provider stored and
+none to import, the server logs a one-time `SETUP URL` at startup instead: see
+[First-run setup](authentication.md#first-run-setup).
+
+:::caution[Check the redirect URI before you upgrade]
+A sign-in provider that rejects the redirect URI locks out everyone who uses
+it. Compare what is registered in the provider's console with
+`<FRONTEND_BASE_URL>/api/v1/auth/callback` before you pull the new image, and
+add that address there if it is missing. Most providers accept several
+redirect URIs, so you can add it next to the old one.
+:::
+
+Who is affected: every instance that signs users in through Google, GitHub or
+an OIDC provider, or that sets an access allowlist. An instance used only on
+localhost with dev login is not.
+
+What to do:
+
+1. **Before upgrading**, make sure `<FRONTEND_BASE_URL>/api/v1/auth/callback`
+   is registered as a redirect URI in each provider's console.
+2. **Before upgrading**, make sure `INSTANCE_ADMIN_EMAILS` names at least one
+   address you can sign in with. Only an instance admin can open the new
+   settings page (see [Instance Admin Portal](instance-admin.md)).
+3. Pull the new image and restart. In the logs, look for
+   `Imported the config.yaml auth providers into the database` and, if you had
+   an allowlist, `Imported the config.yaml auth.access_allowlist into the
+   database`. Read any `was not imported` warning next to them.
+4. Sign in, open the admin area and then **Settings** → **Authentication**.
+   Check that each provider you expect is listed and enabled, and that the
+   **Access allowlist** card shows **Restricted** with your domains and
+   addresses if you had an allowlist.
+5. Remove the thirteen environment variables above from your deployment, or
+   the six keys from a mounted `config.yaml`. From now on, change these
+   settings in the admin area.
+
+Do step 5 soon, not eventually. While the variables remain they can bring back
+a provider or an allowlist you removed, and they are scheduled to become a
+startup failure: no earlier than the second minor release after v0.15.0, the
+server will refuse to start while any of them is still set.
+
+If sign-in does not work after the upgrade, see
+[Lockout Recovery](lockout-recovery.md).
+
 ### Search ranking and AI summary defaults moved to Admin → Settings (v0.15.0)
 
 The instance-wide search ranking defaults and AI summary defaults are no longer

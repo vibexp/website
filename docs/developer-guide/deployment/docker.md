@@ -43,8 +43,9 @@ Its `environment:` block carries the database connection (`DB_HOST: postgres`,
 `DB_USER`, `DB_PASSWORD`, `DB_NAME`), the required `ENCRYPTION_KEY`, plus
 `SESSION_ENCRYPTION_KEY` (needed for production session auth; empty disables cookie sessions) and the public origin (`FRONTEND_BASE_URL`). Other baked
 operator knobs include `DB_SSLMODE` (`require` for managed Postgres TLS),
-`INSTANCE_ADMIN_EMAILS` (grants the admin portal), and
-`AUTH_ALLOWED_DOMAINS` / `AUTH_ALLOWED_EMAILS` (restrict sign-in). Its
+and `INSTANCE_ADMIN_EMAILS` (names the root instance admins). Sign-in providers
+and the access allowlist are not environment variables: they are managed in the
+admin area ([Authentication & MCP Auth](../../user-guide/self-hosting/authentication.md)). Its
 healthcheck hits `http://localhost:8080/ping`. See
 [Configuration Reference](configuration-reference.md)
 for which of these you must change for production.
@@ -62,8 +63,7 @@ baked default.
 :::caution
 There is no generic environment override: an env var only has an effect if the
 loaded `config.yaml` references it as `${VAR}`. Settings the baked file does not
-reference (multi-provider `auth.providers` lists, `auth.oauth_as.*` token TTLs,
-…) require mounting your own file (see below).
+reference (`auth.oauth_as.*` token TTLs, …) require mounting your own file (see below).
 :::
 
 ### Taking full control: mount your own `config.yaml`
@@ -89,7 +89,7 @@ docker run -p 8080:8080 \
   -e DB_HOST=your-db-host -e DB_PASSWORD=secret \
   -e ENCRYPTION_KEY="$(openssl rand -base64 24 | cut -c1-32)" \
   -e FRONTEND_BASE_URL=https://vibexp.example.com \
-  ghcr.io/vibexp/vibexp:0.10.0
+  ghcr.io/vibexp/vibexp:0.15.0
 ```
 
 The baked `FRONTEND_BASE_URL` defaults to **empty** (fail-closed: the dev-login
