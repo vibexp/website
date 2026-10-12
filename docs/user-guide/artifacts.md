@@ -257,6 +257,8 @@ vibexp_io_delete_resource({
 
 Deleting an artifact also removes its search embeddings and its attachments.
 
+A locked artifact cannot be deleted, and some of its fields (slug, status, type, project, labels, metadata) are frozen until it is unlocked. See [Resource locking](resource-locking.md).
+
 ## Common Use Cases
 
 ### Code Snippet Library

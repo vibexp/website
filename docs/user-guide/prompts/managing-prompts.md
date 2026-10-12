@@ -93,6 +93,8 @@ To permanently remove a prompt:
 2. Click the **Delete** button (trash icon) in the Actions column
 3. Confirm deletion in the dialog that appears
 
+A locked prompt cannot be deleted, and some of its fields (slug, status, project, labels, MCP availability) are frozen until it is unlocked. See [Resource locking](../resource-locking.md).
+
 **Warning:** Deleted prompts cannot be recovered. If other prompts reference the deleted prompt using the `@` syntax, those references will fail to resolve.
 
 ### Before Deleting

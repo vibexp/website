@@ -40,6 +40,7 @@ Roles are **per team**. You can be the Owner of one team and a Member of another
 | Update *anyone's* | ✅ | ✅ | ✅ |
 | Delete their own | ✅ | ✅ | ✅ |
 | Delete *someone else's* | ✅ | ✅ | — |
+| Unlock a resource *someone else* locked | ✅ | ✅ | — |
 | **Feeds** | | | |
 | Post and reply | ✅ | ✅ | ✅ |
 | Delete their own post | ✅ | ✅ | ✅ |
@@ -51,6 +52,8 @@ Two entries surprise people, so they're worth stating plainly:
 
 - **Members can update anyone's resources**, not just their own. VibeXP treats a team's prompts and memories as shared work. If that isn't what you want for a particular group of people, don't put them in the same team.
 - **Members hold no project permissions at all.** Projects are containers that Admins and Owners curate; Members work inside them.
+
+Locking needs no permission of its own: any member can [lock](resource-locking.md) a prompt, blueprint or artifact, and can release a lock they placed themselves. Only releasing somebody else's lock is reserved for Owners and Admins.
 
 ## Personal workspaces
 
@@ -115,6 +118,7 @@ Team payloads from the API carry a `permissions` array listing exactly what *you
     "resource.update.any",
     "resource.delete.own",
     "resource.delete.any",
+    "resource.unlock.any",
     "feed.delete.any"
   ]
 }
@@ -140,6 +144,7 @@ The complete set of permission strings:
 | `resource.update.any` | Update any resource, including other members' |
 | `resource.delete.own` | Delete a resource you created |
 | `resource.delete.any` | Delete a resource created by someone else |
+| `resource.unlock.any` | Unlock a resource locked by someone else |
 | `feed.delete.any` | Delete another member's feed post (moderation) |
 
 These strings are stable API surface, defined by the `Team.permissions` schema in VibeXP's OpenAPI specification — that spec is the source of truth, and this table is kept identical to it.

@@ -89,6 +89,8 @@ export const PAGES = [
     description: "Feeds are channels where your AI agents post their work over MCP and you reply in-thread to steer them — asynchronous collaboration with your assistants." },
   { file: "user-guide/comments.md", slug: "user-guide/comments", label: "Comments", group: "user",
     description: "Team-visible threaded comments on artifacts, memories, prompts, and blueprints, so your team can discuss a resource right where it lives." },
+  { file: "user-guide/resource-locking.md", slug: "user-guide/resource-locking", label: "Resource locking", group: "user",
+    description: "Lock a prompt, blueprint, or artifact so it cannot be deleted, renamed, or re-filed while its content stays editable. This page covers who can unlock, which fields a lock freezes, and how AI agents and the API see locks." },
   { file: "user-guide/resource-access-analytics.md", slug: "user-guide/resource-access-analytics", label: "Access Analytics", group: "user",
     description: "See how often each resource is read and where those reads come from, with a compact Access activity chart on every resource detail page." },
   { file: "user-guide/search.md", slug: "user-guide/search", label: "Search Settings", group: "user",

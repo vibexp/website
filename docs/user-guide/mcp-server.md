@@ -298,6 +298,20 @@ One generic tool covers all four deletable resource types. Pass `resource_type` 
 
 Deleting a resource also removes its search embeddings, and deleting an artifact removes its attachments.
 
+### Locking Resources
+
+- **vibexp_io_lock_resource**: Lock a single prompt, blueprint, or artifact so it cannot be deleted and its identifying fields cannot be changed; its content stays editable
+
+One generic tool covers the three lockable resource types. Pass `resource_type`, the identifier(s) that type requires, and a `comment` saying why the resource is locked (required, at most 500 characters, shown to the team):
+
+| `resource_type` | Required identifiers      |
+| --------------- | ------------------------- |
+| `prompt`        | `slug`                    |
+| `artifact`      | `project_id` and `slug`   |
+| `blueprint`     | `project_id` and `slug`   |
+
+There is **no unlock tool**: a person unlocks in the web app or through the REST API. Updates and deletes made over MCP are refused on a locked resource with an error naming the locker and the reason. See [Resource locking](resource-locking.md) for what a lock freezes.
+
 :::note[Prompts are also native MCP prompts]
 Beyond the tools above, your prompts marked **Available in MCP** are exposed as native MCP prompts, unless they are drafts: a prompt in any other status, **Published** or one of the team's [custom statuses](statuses.md), is exposed. Clients that support MCP prompts (such as Claude Code) can list them by name (the prompt's slug), see their placeholder arguments, and render them with values filled in.
 :::
