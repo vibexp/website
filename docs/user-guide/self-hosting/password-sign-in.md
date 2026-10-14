@@ -127,7 +127,7 @@ A team invitation link works for someone who has no account yet. Signed out, it 
 **A root admin's address cannot create its account from an invitation.** That account comes from the setup page, the recovery path or a sign-in through a provider.
 
 :::caution[An unverified password account can be taken over by its address's owner]
-An account created from an invitation, or set up through a link an admin handed over, has an address nobody has verified. If someone later signs in through a provider that reports that address as **verified**, that sign-in takes the account over: its password and pending links are removed, and its API keys and sessions are revoked. This protects the real owner of the address from an account someone else set up with it. Once an address is verified (see [Forgot password](#forgot-password)), this no longer happens.
+An account created from an invitation, or set up through a link an admin handed over, has an address nobody has verified. If someone later signs in through a provider that reports that address as **verified**, that sign-in takes the account over: its password and pending links are removed, and its API keys and sessions are revoked. This protects the real owner of the address from an account someone else set up with it. When an email provider is configured, the address then receives an email, "Your &lt;instance name&gt; password was removed", naming the provider that signed in. Once an address is verified (see [Forgot password](#forgot-password)), this no longer happens.
 :::
 
 ## Forgot password
