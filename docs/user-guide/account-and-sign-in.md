@@ -55,11 +55,13 @@ If an administrator disabled your password, the page says **Disabled by an admin
 
 **Sign-in methods** lists your password and each connected sign-in provider, with when it was connected and last used. Your only way to sign in can never be removed: add another one first.
 
-**Disconnect** removes a provider account from yours, and signs out your other devices. A disconnected provider account stays out: signing in with it again does not reconnect it, even with the same email address. The sign-in page explains why it was refused. To use it again, sign in another way, find it under **Disconnected** on this page and choose **Allow again**. The next sign-in through that provider then connects it.
+**Disconnect** on a provider's row removes that provider account from yours (confirm with **Disconnect &lt;Provider&gt;**) and signs out your other devices. A disconnected provider account stays out: signing in with it again does not reconnect it, even with the same email address. Such a sign-in is refused with **This sign-in was disconnected**.
+
+Disconnected provider accounts are listed under **Disconnected**, each with the date. To use one again, sign in another way and choose **Allow again** on its row. That connects nothing yet: your next sign-in through that provider with your account's email address connects it again. If an administrator re-creates a provider under a new name in the sign-in URL (its slug), it counts as a different provider.
 
 ### Sign in again for sensitive changes
 
-Setting a first password, removing your password, disconnecting a provider and allowing one again are only possible within 10 minutes of signing in. Otherwise the page asks you to **Sign in again** first. These changes are only possible from the browser, not with an API key or a connected tool.
+Setting a first password, removing your password, disconnecting a provider and allowing a disconnected one again are only possible within 10 minutes of signing in. Otherwise the page says **Sign in again to change your sign-in methods**, with a **Sign in again** button. These changes are only possible from the browser, not with an API key or a connected tool.
 
 ## Related
 
