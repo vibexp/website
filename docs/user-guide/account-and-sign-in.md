@@ -17,7 +17,7 @@ A password needs at least 12 characters. It cannot be a common password or your 
 :::caution[Verify your address before you sign in through a provider]
 An account created from an invitation, or from a link an administrator handed you, has an address that is not verified yet. While it is not, the **first** sign-in through a provider that reports the address as verified, even your own, takes the account over: your password is removed, and your API keys, connected tools and sessions are revoked. This protects the address's real owner from an account someone else set up with it.
 
-To keep your password, verify the address first by completing an emailed link: choose **Forgot password?** on the sign-in page and use the link it sends. After that, a provider sign-in simply adds itself as another way in.
+To keep your password, verify the address first by completing an emailed link: choose **Forgot password?** on the sign-in page and use the link it sends. After that, a provider sign-in simply adds itself as another way in. If your instance does not send email, there is no way to verify the address first, so the first provider sign-in always replaces the password.
 :::
 
 If a link says **This link is not valid**, it has expired or was already used. Ask for a new one. If you already set a password, sign in with it.
