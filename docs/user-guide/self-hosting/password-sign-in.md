@@ -95,19 +95,22 @@ After **Create user**, the dialog says how the person gets in:
 
 A setup link works **once** and for **7 days**. A root admin's link is never shown on screen (it would hand over a root admin account): set up email, or use the setup page or the recovery command for that address.
 
-On the user's page, **Sign-in methods** shows **Pending setup** until the account has a way in. The **Users** list marks such accounts **Pending setup** too, and its **Account setup** filter (**Any setup**, **Pending setup**, **Set up**) lists only those or only the others. For a pending account, **Get setup link** emails a new link or shows it here. A new emailed link replaces the earlier emailed one, and a new shown link the earlier shown one; an emailed and a shown link can be valid at the same time.
+On the user's page, **Sign-in methods** shows **Pending setup** until the account has a way in. The **Users** list marks such accounts **Pending setup** too, and its **Account setup** filter (**Any setup**, **Pending setup**, **Set up**) lists only those or only the others. For a pending account, **Get setup link** emails a new link or shows it here; any earlier setup link stops working, emailed or shown.
 
 ## Reset or remove a password
 
 On the page of an account that has a password:
 
 - **Reset password** emails a reset link (it works for 1 hour) or shows it here once (it works for 24 hours). By default the current password and the person's sessions keep working until they use the link.
-  - An account that has a sign-in provider connected and an address that is **not verified** (every account from before v0.16.0, until its next provider sign-in with a verified address) cannot be emailed a link: use **Show the link here** and hand it over.
-  - A root admin's link is never shown on screen. For a root admin in that position, use the [recovery command](#recovery-command-set-a-root-admins-password) or the setup page.
 - **Sign out and disable the current password now** is for a password that may be known to someone else. It asks again, then disables the current password at once and signs the person out everywhere. Their page then shows **Password (disabled)**, and on their side **Disabled by an administrator**: only a new link from an admin lets them set a password again.
 - **Remove password** takes the password away. Their signed-in sessions keep running. If it is their only way to sign in, the dialog asks again (**This is their only way to sign in** → **Remove it anyway**); the account is then **Pending setup** until you send a setup link or they sign in through a provider with that address.
 
 An account that signs in only through a provider gets **Send a link to set a password** instead: the way back in when the instance loses or switches off that provider.
+
+A new link from an administrator replaces every earlier link of its kind for that account, emailed or shown, including a forgot-password link the person requested themselves. Two cases need another route, for **Reset password** and **Send a link to set a password** alike:
+
+- An account that has a sign-in provider connected and an address that is **not verified** (every account from before v0.16.0, until its next provider sign-in with a verified address) cannot be emailed a link: use **Show the link here** and hand it over.
+- A root admin's link is never shown on screen. For a root admin in that position, use the [recovery command](#recovery-command-set-a-root-admins-password) or the setup page.
 
 These actions are hidden on your own account. A suspended account cannot be sent setup or reset links (reactivate it first), but its password can be removed. Setup and reset links are unavailable while password sign-in is off; removing a password is not.
 

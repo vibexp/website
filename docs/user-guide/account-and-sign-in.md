@@ -14,8 +14,10 @@ You cannot sign up with a password on the sign-in page. You set one through a li
 
 A password needs at least 12 characters. It cannot be a common password or your email address.
 
-:::note[Sign in once through a provider to keep the account]
-An account created from an invitation, or from a link an administrator handed you, has an address that is not verified yet. Until it is, a sign-in through a provider that reports that address as verified takes the account over, removing the password: it protects the address's real owner from an account someone else set up. An emailed setup or reset link verifies your address, and so does signing in through a provider that reports it verified.
+:::caution[Verify your address before you sign in through a provider]
+An account created from an invitation, or from a link an administrator handed you, has an address that is not verified yet. While it is not, the **first** sign-in through a provider that reports the address as verified, even your own, takes the account over: your password is removed, and your API keys, connected tools and sessions are revoked. This protects the address's real owner from an account someone else set up with it.
+
+To keep your password, verify the address first by completing an emailed link: choose **Forgot password?** on the sign-in page and use the link it sends. After that, a provider sign-in simply adds itself as another way in.
 :::
 
 If a link says **This link is not valid**, it has expired or was already used. Ask for a new one. If you already set a password, sign in with it.

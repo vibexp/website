@@ -76,8 +76,9 @@ settings** ([Signing In and Your Account](../account-and-sign-in.md#sign-in-meth
 
 **Existing provider accounts get no reset email until their address is
 verified.** Accounts created before this release have no record of whether
-their address was verified. Such an account gets no forgot-password email until its next sign-in through a provider that
-reports the address verified, and an administrator cannot email it a reset
+their address was verified. Such an account gets no forgot-password email
+until its next sign-in through a provider that reports the address verified,
+and an administrator cannot email it a reset
 link either. Someone who can no longer use their provider needs an
 administrator to show them a reset link and hand it over
 ([Reset or remove a password](password-sign-in.md#reset-or-remove-a-password));
