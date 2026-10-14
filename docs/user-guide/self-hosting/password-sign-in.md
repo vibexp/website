@@ -23,7 +23,7 @@ Open **Admin Portal** from the user menu, then **Settings** → **Authentication
 
 A change takes effect at once on the server that saved it. On an instance with several servers (replicas), the others pick it up within about 2 seconds.
 
-While no email provider is configured, the card warns **Forgotten passwords need an administrator**: nobody can be sent a reset link, so whoever forgets their password needs one from an admin. See [Without an email provider](#without-an-email-provider).
+While password sign-in is on and no email provider is configured, the card warns **Forgotten passwords need an administrator**: nobody can be sent a reset link, so whoever forgets their password needs one from an admin. See [Without an email provider](#without-an-email-provider).
 
 ### Switching it off
 
@@ -75,24 +75,7 @@ So on a password-only instance, losing the last admin password puts the instance
 
 ## Recovery command: set a root admin's password
 
-```bash
-docker exec -it <container> ./main admin auth password set --email admin@example.com
-```
-
-It sets the password of a **root** instance admin (an address in `auth.instance_admins`):
-
-- **The account must already exist.** The command cannot create it. For a root admin with no account yet, run `setup rearm` and create it from the setup page with **Use email and password**.
-- **The password is never a flag or an argument.** In a terminal it is asked for twice, without echo. Otherwise it is read from standard input:
-
-  ```bash
-  printf '%s' "$NEW_PASSWORD" | docker exec -i <container> ./main admin auth password set --email admin@example.com
-  ```
-
-- It must satisfy the [password rules](#passwords).
-- The account's sessions are ended; its API keys are kept.
-- `--enable-login` also switches password sign-in on for the instance.
-
-Like the other `admin auth` commands, it works without a running server and is recorded in the change history as **Server CLI**.
+`./main admin auth password set --email <root-admin-email>` sets the password of a **root** instance admin whose account already exists, reading the password from the terminal or standard input, never from the command line. `--enable-login` also switches password sign-in on. It cannot create the account: for a root admin with no account yet, run `setup rearm` and use **Use email and password** on the setup page. See [Set a root admin's password](lockout-recovery.md#set-a-root-admins-password) for the details.
 
 ## Create users and hand over setup links
 
@@ -112,13 +95,15 @@ After **Create user**, the dialog says how the person gets in:
 
 A setup link works **once** and for **7 days**. A root admin's link is never shown on screen (it would hand over a root admin account): set up email, or use the setup page or the recovery command for that address.
 
-On the user's page, **Sign-in methods** shows **Pending setup** until the account has a way in. The **Users** list marks such accounts **Pending setup** too, and its **Setup** filter lists only those (or only the others). For a pending account, **Get setup link** emails a new link or shows it here; **any earlier link stops working**.
+On the user's page, **Sign-in methods** shows **Pending setup** until the account has a way in. The **Users** list marks such accounts **Pending setup** too, and its **Account setup** filter (**Any setup**, **Pending setup**, **Set up**) lists only those or only the others. For a pending account, **Get setup link** emails a new link or shows it here. A new emailed link replaces the earlier emailed one, and a new shown link the earlier shown one; an emailed and a shown link can be valid at the same time.
 
 ## Reset or remove a password
 
 On the page of an account that has a password:
 
 - **Reset password** emails a reset link (it works for 1 hour) or shows it here once (it works for 24 hours). By default the current password and the person's sessions keep working until they use the link.
+  - An account that has a sign-in provider connected and an address that is **not verified** (every account from before v0.16.0, until its next provider sign-in with a verified address) cannot be emailed a link: use **Show the link here** and hand it over.
+  - A root admin's link is never shown on screen. For a root admin in that position, use the [recovery command](#recovery-command-set-a-root-admins-password) or the setup page.
 - **Sign out and disable the current password now** is for a password that may be known to someone else. It asks again, then disables the current password at once and signs the person out everywhere. Their page then shows **Password (disabled)**, and on their side **Disabled by an administrator**: only a new link from an admin lets them set a password again.
 - **Remove password** takes the password away. Their signed-in sessions keep running. If it is their only way to sign in, the dialog asks again (**This is their only way to sign in** → **Remove it anyway**); the account is then **Pending setup** until you send a setup link or they sign in through a provider with that address.
 
@@ -128,13 +113,19 @@ These actions are hidden on your own account. A suspended account cannot be sent
 
 ## Invitations
 
-A team invitation link works for someone who has no account yet. Signed out, it shows the team, who invited them and the invited address, and offers **Create your account**: an optional name and a password. **Create account and join** creates the account and adds them to the team. The address is the invited one and cannot be changed.
+A team invitation link works for someone who has no account yet. Signed out, it shows the team, who invited them and the invited address, and offers "Create your account for &lt;address&gt; to join": an optional name and a password. **Create account and join** creates the account and adds them to the team. The address is the invited one and cannot be changed.
 
 - With password sign-in off, the page offers the enabled providers only.
 - Someone whose address already has an account gets **Sign in to accept**.
 - Under **Invitation only**, this is the way in for a new person, together with admin-created accounts.
 
-**The access allowlist still applies.** An invited address that the allowlist does not admit is refused ("Access to this instance is restricted."), so allow the domain or the address before you invite someone outside it. Root admins are exempt, as at sign-in.
+**The access allowlist still applies.** An invited address that the allowlist does not admit is refused ("Access to this instance is restricted."), so allow the domain or the address before you invite someone outside it.
+
+**A root admin's address cannot create its account from an invitation.** That account comes from the setup page, the recovery path or a sign-in through a provider.
+
+:::caution[An unverified password account can be taken over by its address's owner]
+An account created from an invitation, or set up through a link an admin handed over, has an address nobody has verified. If someone later signs in through a provider that reports that address as **verified**, that sign-in takes the account over: its password and pending links are removed, and its API keys and sessions are revoked. This protects the real owner of the address from an account someone else set up with it. Once an address is verified (see [Forgot password](#forgot-password)), this no longer happens.
+:::
 
 ## Forgot password
 
@@ -145,7 +136,7 @@ No email is sent (and the page still says the same) when:
 - no instance email provider is configured;
 - the account is suspended, or an admin disabled its password;
 - the [access allowlist](authentication.md#restricting-who-can-sign-in-optional) does not admit the address;
-- the account has a sign-in provider connected and its address is **not verified**. This covers accounts from before v0.16.0 until their next provider sign-in with a verified address: someone who can no longer use their provider needs a reset link from an admin.
+- the account has a sign-in provider connected and its address is **not verified**. This covers accounts from before v0.16.0 until their next provider sign-in with a verified address: someone who can no longer use their provider needs an admin to show them a reset link ([Reset or remove a password](#reset-or-remove-a-password)).
 
 An address is verified when the person signs in through a provider that reports it verified, completes an emailed setup or reset link, or when the operator set it up on the setup page. Dev-login accounts never get reset emails.
 

@@ -8,11 +8,15 @@ This page covers the password side and the **Account settings** page. Running an
 
 You cannot sign up with a password on the sign-in page. You set one through a link:
 
-- **A team invitation.** Open the invitation link while signed out. It shows the team, who invited you and the invited address. Under **Create your account**, enter a name (optional) and a password twice, then **Create account and join**. You are signed in and land in the team. If your address already has an account, the page offers **Sign in to accept** instead.
+- **A team invitation.** Open the invitation link while signed out. It shows the team, who invited you and the invited address. Under "Create your account for &lt;your address&gt; to join", enter a name (optional) and a password twice, then **Create account and join**. You are signed in and land in the team. If your address already has an account, the page offers **Sign in to accept** instead.
 - **A setup link from an administrator**, when they created your account for you. It opens **Set up your account** with your address filled in. Choose a password, then **Create password and sign in**. A setup link works once, for 7 days.
 - **Account settings**, if you already sign in through a provider: see [Set, change or remove your password](#set-change-or-remove-your-password).
 
 A password needs at least 12 characters. It cannot be a common password or your email address.
+
+:::note[Sign in once through a provider to keep the account]
+An account created from an invitation, or from a link an administrator handed you, has an address that is not verified yet. Until it is, a sign-in through a provider that reports that address as verified takes the account over, removing the password: it protects the address's real owner from an account someone else set up. An emailed setup or reset link verifies your address, and so does signing in through a provider that reports it verified.
+:::
 
 If a link says **This link is not valid**, it has expired or was already used. Ask for a new one. If you already set a password, sign in with it.
 
@@ -27,7 +31,7 @@ Choose **Forgot password?** under the password form.
 - **If your instance sends email:** enter your address and choose **Email me a reset link**. If the address belongs to an account, a link arrives that works for 1 hour. Open it, choose a new password, and choose **Set password and sign in**. You are signed in, and your other browsers are signed out. Tick **Also revoke API keys and connected tools** if you think someone else had access: it deletes your API keys and disconnects MCP and other connected tools.
 - **If it does not:** the page says **Ask your administrator**. An administrator can give you a link to set a new password.
 
-No email arrives if your account signs in through a provider and your address has not been verified yet. Signing in through that provider once verifies it. Otherwise, ask an administrator for a link.
+No email arrives if your account signs in through a provider and your address has not been verified yet. Signing in through that provider once verifies it. Otherwise, ask an administrator to show you a reset link and hand it over.
 
 ## Account settings
 

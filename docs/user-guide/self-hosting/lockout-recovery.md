@@ -73,6 +73,7 @@ docker exec -it <container> ./main admin auth password set --email admin@example
 - It must be at least 12 characters, not a common password and not the email address.
 - The account's sessions are ended; its API keys are kept.
 - `--enable-login` also switches password sign-in on for the instance, for when it was switched off.
+- The password change itself is not recorded in the change history under **Settings** → **Authentication**. Switching password sign-in on with `--enable-login` is, attributed to **Server CLI**.
 
 ## Recovery mode
 

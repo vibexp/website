@@ -66,17 +66,22 @@ Team invitation addresses are stored in lower case too; that cannot clash.
 
 **One account can hold several sign-in methods.** Sign-in identities move to
 their own table, so an account can have a password and several providers. A
-sign-in through a provider that reports a **verified** address matching an
-existing account now connects to that account. People can see and disconnect their
-methods under **Settings** → **Account settings**
-([Signing In and Your Account](../account-and-sign-in.md#sign-in-methods)).
+sign-in through another provider that reports a **verified** address matching
+an existing account connects to that account, but only once the account's own
+address is verified. No account from before this release is: until it has
+signed in once through its own provider with a verified address, a sign-in
+through a different provider is refused with "Sign in the way you did before".
+People can see and disconnect their methods under **Settings** → **Account
+settings** ([Signing In and Your Account](../account-and-sign-in.md#sign-in-methods)).
 
 **Existing provider accounts get no reset email until their address is
 verified.** Accounts created before this release have no record of whether
 their address was verified. Such an account gets no forgot-password email until its next sign-in through a provider that
-reports the address verified. Someone who can no longer use their provider
-needs a reset link from an administrator
-([Reset or remove a password](password-sign-in.md#reset-or-remove-a-password)).
+reports the address verified, and an administrator cannot email it a reset
+link either. Someone who can no longer use their provider needs an
+administrator to show them a reset link and hand it over
+([Reset or remove a password](password-sign-in.md#reset-or-remove-a-password));
+for a root admin, use the recovery command or the setup page instead.
 Dev-login accounts never get reset emails.
 
 Nothing else needs action. To use passwords, switch them on under
