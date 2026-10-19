@@ -121,6 +121,8 @@ export const PAGES = [
     description: "Give instance-wide operators the admin portal on your self-hosted VibeXP: root admins from the configuration, admins granted in the admin area, and what the portal shows and configures." },
   { file: "user-guide/self-hosting/site-info.md", slug: "user-guide/self-hosting/site-info", label: "Site Info (Branding)", group: "selfhost",
     description: "Brand your self-hosted VibeXP in Admin, Settings, Site info: company name, contact email, website, support, terms and privacy links, and light and dark logos. What each value shows, what happens when it is empty, and the VibeXP attribution that always remains." },
+  { file: "user-guide/self-hosting/audit-log.md", slug: "user-guide/self-hosting/audit-log", label: "Audit Log", group: "selfhost",
+    description: "The instance audit log: what VibeXP records, browsing and filtering events in the admin area, CSV export, and the retention and IP address capture settings." },
   { file: "user-guide/self-hosting/lockout-recovery.md", slug: "user-guide/self-hosting/lockout-recovery", label: "Lockout Recovery", group: "selfhost",
     description: "Get back into a self-hosted VibeXP after an authentication misconfiguration: the admin auth commands to list, enable and disable providers, clear the allowlist, re-arm setup and set a root admin's password, and the recovery mode flag." },
   { file: "user-guide/self-hosting/search-and-ai-summary-settings.md", slug: "user-guide/self-hosting/search-and-ai-summary-settings", label: "Search & AI Summary Settings", group: "selfhost",

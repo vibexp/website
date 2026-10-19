@@ -41,7 +41,7 @@ docker compose logs app | grep "SETUP URL"
 1. **Name a root admin before you start.** Set `INSTANCE_ADMIN_EMAILS` to your own email address (see [Instance Admin Portal](instance-admin.md)); with the bundled `docker-compose.yml`, add it to the `app` service's `environment:` block. Setup ends when a root admin signs in, and it is read from the configuration at startup, so adding it later needs a restart.
 2. **Open the setup URL.** The page is headed **Set up sign-in for this instance**. The token is removed from the address bar as soon as the page loads, and a reload continues on the setup session's cookie.
 3. **Add and enable a sign-in provider**, as described in [Sign-in providers](#sign-in-providers) below. Or, for an instance without providers, use the **Use email and password** card to give the root admin a password: see [Run an instance on passwords alone](password-sign-in.md#run-an-instance-on-passwords-alone). You can also set the [access allowlist](#restricting-who-can-sign-in-optional) here.
-4. **Finish.** Once a provider is enabled, a **Finish setup** card appears with a **Sign in with &lt;provider&gt; as a root admin to finish setup** button. Setup is finished when an address listed in `INSTANCE_ADMIN_EMAILS` signs in through an enabled provider, or with the password set on the setup page.
+4. **Finish.** Once a provider is enabled, a **Finish setup** card appears with a **Sign in with &lt;provider&gt; as a root admin to finish setup** button. Setup is finished when an address listed in `INSTANCE_ADMIN_EMAILS` signs in through an enabled provider that reports that address as verified, or with the password set on the setup page.
 
 What to know about the token and the session:
 
@@ -181,7 +181,7 @@ The **Access allowlist** card on the same page restricts sign-in by email domain
 
 A user is allowed if **either** list matches. **Save allowlist** stores the lists, and **Reset to open access** removes them.
 
-**The allowlist is enforced immediately, not only at sign-in.** It is checked at sign-in, when an MCP client asks for consent, and on every request of a user who is already signed in. A change is picked up within a few seconds, with no restart. So when a save would shut out people who are signed in, the page first shows how many signed-in users would be signed out, with a sample of their addresses, and the confirmation button reads **Save and sign them out**. Their next request ends their session, and they cannot sign in again until the allowlist lets them.
+**The allowlist is enforced immediately, not only at sign-in.** It is checked at sign-in, when an MCP client asks for consent, and on every request of a user who is already signed in. A change applies at once on the server that saved it, and within about 2 seconds on other replicas, with no restart. So when a save would shut out people who are signed in, the page first shows how many signed-in users would be signed out, with a sample of their addresses, and the confirmation button reads **Save and sign them out**. Their next request ends their session, and they cannot sign in again until the allowlist lets them.
 
 Two more rules apply while the allowlist is restricted:
 
@@ -194,7 +194,7 @@ If the allowlist locks out everyone who could fix it, see [Lockout Recovery](loc
 
 Instance admins get the admin portal, which is where the settings above live. There are two kinds:
 
-- **Root admins** are listed in `INSTANCE_ADMIN_EMAILS` (comma-separated), or `auth.instance_admins` in a mounted `config.yaml`. They are read from the configuration at startup.
+- **Root admins** are listed in `INSTANCE_ADMIN_EMAILS` (comma-separated), or `auth.instance_admins` in a mounted `config.yaml`. They are read from the configuration at startup, and hold root admin power only once their account's email is verified (see [Root admins need a verified email](instance-admin.md#root-admins-need-a-verified-email)).
 - **Granted admins** are added by a root admin in the **Instance admins** card under **Settings** → **Authentication**.
 
 ```bash

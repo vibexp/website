@@ -49,7 +49,9 @@ Open **Settings** → **Account settings**: your name, your password and the way
 - **Change password** needs your **Current password**, then the new one twice. Your other devices are signed out. Tick **Also revoke API keys and connected tools** to also delete your API keys and disconnect your MCP and CLI tools.
 - **Remove password** is offered when an enabled sign-in provider is connected to your account. Afterwards you sign in through the provider only, and your other devices are signed out.
 
-If an administrator disabled your password, the page says **Disabled by an administrator**. The password cannot sign you in and cannot be changed here. Ask the administrator for a link to set a new one; using it lifts the block.
+When password sign-in is switched off for the instance, the page says "Your administrator has not switched password sign-in on for this instance, so a password cannot be set or changed here." A password you already have is kept, but cannot sign you in until it is switched on.
+
+If an administrator disabled your password, its row is marked **Disabled by an administrator**. The password cannot sign you in and cannot be changed here. Ask the administrator for a link to set a new one; using it lifts the block.
 
 ### Sign-in methods
 

@@ -39,7 +39,7 @@ Connect your AI tools directly to your VibeXP account through our MCP server. Ac
 
 ## Getting Started
 
-Ready to supercharge your AI workflow? Start with our [Quick Start Guide](quick-start.md) to get up and running in minutes.
+Ready to supercharge your AI workflow? After your first sign-in, VibeXP walks you through **Getting started**, which connects Claude Code in about 5 minutes. The [Quick Start Guide](quick-start.md) covers the same ground and other clients.
 
 ## Key Features
 

@@ -42,8 +42,17 @@ paths, v0.8.0), `009` (blueprint source content SHA, v0.8.0), `010` (typed
 resource relations, v0.8.0), and `011_consolidated` (v0.9.0, squashing the
 post-v0.8.0 increments: user status, per-team search settings, per-team
 GitHub App configs, per-team email providers, and the removal of AI-tool
-hook ingestion, billing/subscriptions, and Firebase web push), and `012`
-(schedules, v0.10.0). A pre-existing
+hook ingestion, billing/subscriptions, and Firebase web push), `012`
+(schedules, v0.10.0), `013_consolidated` (resource freshness and team project
+search, v0.11.0), `014` (embedding jobs) and `015` (team settings audit,
+v0.12.0), `016_consolidated` (resource labels and memory titles, v0.13.0),
+`017` (team AI summary settings) and `018` (prompt references team scope,
+v0.14.0), `019_consolidated` (instance email, search, AI summary and auth
+settings, team statuses, resource locks, v0.15.0), `020` (instance site info)
+and `021` (privacy URL moved to site info, v0.15.0), `022_consolidated`
+(resource write events, user identities and email and password sign-in,
+v0.16.0), and `023_consolidated` (the audit log and its settings, v0.17.0). A
+pre-existing
 pre-v0.3.0 database must be stamped to the matching version so the
 consolidated files are never re-run against a populated schema.
 :::
@@ -72,6 +81,17 @@ The current set (`.up.sql` shown; each has a matching `.down.sql`):
 010_resource_relations.up.sql
 011_consolidated.up.sql
 012_schedules.up.sql
+013_consolidated.up.sql
+014_embedding_jobs.up.sql
+015_team_settings_audit.up.sql
+016_consolidated.up.sql
+017_team_ai_summary_settings.up.sql
+018_prompt_references_team_scope.up.sql
+019_consolidated.up.sql
+020_instance_site_info.up.sql
+021_move_privacy_url_to_site_info.up.sql
+022_consolidated.up.sql
+023_consolidated.up.sql
 ```
 
 `NNN` is a zero-padded, strictly increasing sequence number. Every `.up.sql` must

@@ -12,7 +12,7 @@ It carries:
 - the account emails of [password sign-in](password-sign-in.md): setup links, password reset links and password-change notices.
 
 :::note[Without a provider, addresses are verified only through sign-in providers]
-A password reset email goes only to an address that is verified, or to an account with no sign-in provider connected. On an instance without an email provider, an account's address is only ever verified through a sign-in provider that reports it verified: completing an emailed setup or reset link would also verify it, but that needs email, and no administrator action marks an address verified.
+A password reset email goes only to an address that is verified, or to an account with no sign-in provider connected. On an instance without an email provider, an account's address is only ever verified through a sign-in provider that reports it verified (or, for a root admin, through the setup page or the recovery command): completing an emailed setup or reset link would also verify it, but that needs email, and nothing in the admin area marks an address verified. The admin link dialogs then offer only **Show the link here**, so setup and reset links are handed over by hand: see [Email and Password Sign-In](password-sign-in.md#reset-or-remove-a-password).
 :::
 
 :::caution[Unconfigured instance mail is discarded, not queued]
