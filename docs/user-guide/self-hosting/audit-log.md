@@ -33,8 +33,11 @@ behind them answers 404. Teams cannot change the audit settings.
 | **Authorization** | An action refused because the caller lacks the permission, with the permission and the caller's role. |
 | **Audit** | An admin list exported to CSV, and the audit settings changed. |
 
-**Reads are not recorded**, and neither is the content of a resource: an
-update records that a field changed, not its old or new value.
+**Reads are not recorded**, and neither is the content of a resource or a
+secret. An update records which fields changed, with the old and new values of
+small fields such as a name or a status and before and after values for
+settings and roles, but a changed content field shows only
+"changed (content is not recorded)".
 
 The [recovery command](lockout-recovery.md) records its changes too. They
 show the actor `recovery-cli` and the channel CLI, with the operating-system
@@ -93,17 +96,17 @@ and applies a saved set again. Presets are personal, up to 20 per admin.
 **Export CSV** downloads every event that matches the current filters, not just
 the current page, as `admin-audit-YYYYMMDD.csv`. An export holds at most
 **50,000** events: when more match, the file stops there and ends with a
-`# TRUNCATED` line, and the page says how many were left out. Narrow the
+`# TRUNCATED` line, and a notice says how many events matched in total. Narrow the
 filters to get the rest.
 
 The columns are `created_at`, `operation`, `outcome`, `source`, `actor_type`,
 `actor_email`, `actor_name`, `actor_user_id`, `team_name`, `team_id`,
 `project_name`, `project_id`, `resource_type`, `resource_name`, `resource_id`,
 `assistant_name`, `api_key_name`, `ip`, `user_agent`, `request_id` and
-`metadata` (as JSON). A cell that starts with `=`, `+`, `-` or `@` gets a
+`metadata` (as JSON). A cell that starts with `=`, `+`, `-`, `@`, a tab or a carriage return gets a
 leading `'`, so a spreadsheet does not run it as a formula.
 
-Every export is itself recorded in the audit log.
+Every completed export is itself recorded in the audit log.
 
 ## Audit log settings
 
