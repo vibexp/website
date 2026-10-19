@@ -26,7 +26,7 @@ behind them answers 404. Teams cannot change the audit settings.
 
 | Area | Operations |
 | --- | --- |
-| **Resources** | Prompts, blueprints and artifacts created, updated, moved to another project, deleted, locked and unlocked. Memories created, updated, moved and deleted. Feeds created, updated and deleted; feed items created, deleted, archived and unarchived. Projects created, updated, deleted and moved to another team. |
+| **Resources** | Prompts, blueprints and artifacts created, updated, moved to another project, deleted, locked and unlocked. Memories created, updated, moved and deleted. Feeds created, updated and deleted; feed items created, deleted, archived and unarchived. Projects created, updated and deleted, and a project's resources migrated to another project in the same team (one event on the source project). |
 | **Auth** | Sign-in, failed sign-in, sign-out, a setup session started, sessions revoked. API keys created and revoked, all API access of a user revoked. A password set, changed, removed, a reset requested and a reset link issued. A sign-in identity connected or disconnected. An MCP client registered, MCP consent granted or denied. |
 | **Team** | Teams created, updated and deleted. Invitations sent, accepted, rejected and revoked. Members added, removed and their role changed. Ownership transferred. Team settings changed: search, AI summary, email, model and embedding providers, freshness, GitHub App, custom types and custom statuses. |
 | **Instance** | Instance settings changed (email, search, AI summary, site info, sign-in providers, allowlist, sign-in policy, instance admins, setup). Users created, updated, suspended, reactivated and deleted in the admin area. |

@@ -24,7 +24,7 @@ Root admins are the trust root of the instance. Because they come from the confi
 
 ### Root admins need a verified email
 
-Since v0.16.0, an address listed in the configuration holds root admin power only once its account's email is **verified**. An address is verified by a sign-in through a provider that reports that same address as verified, by the setup page's **Use email and password**, or by the recovery command `./main admin auth password set --email <email>`. Accounts from before v0.16.0 have no verified address until then.
+Since v0.16.0, an address listed in the configuration holds root admin power only once its account's email is **verified**. An address is verified by a sign-in through a provider that reports that same address as verified, by completing an emailed setup or reset link, by the setup page's **Use email and password**, or by the recovery command `./main admin auth password set --email <email>`. Accounts from before v0.16.0 have no verified address until then.
 
 Until it is verified, a root admin account has no admin portal, cannot grant or remove admins, and is not protected from suspension or deletion. At every start, the server logs one warning per such account:
 
