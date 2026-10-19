@@ -21,7 +21,16 @@ VibeXP is licensed under **MIT**: one license for every repository in the projec
 | Generated TS API client (`@vibexp/api-client`) | `vibexp/api-client-js` | MIT |
 | Design tokens + brand (`@vibexp/design-system`) | separate package | MIT |
 
-Versions of `vibexp/vibexp` up to and including the 0.14 line were published under AGPL-3.0-or-later and keep that license. MIT applies from the next release on.
+Release history of the `vibexp/vibexp` license:
+
+| Releases | License |
+| --- | --- |
+| 0.14 and earlier | AGPL-3.0-or-later |
+| 0.15.0 to 0.16.x | MIT |
+| 0.17.0 | AGPL-3.0-or-later |
+| 0.18.0 and later | MIT |
+
+A published release keeps the license it shipped with.
 
 ## Repository layout
 
