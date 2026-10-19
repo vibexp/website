@@ -46,12 +46,12 @@ The mode decides who can get a **new** account. Accounts that already exist are 
 | Mode | Who gets a new account |
 | --- | --- |
 | **Open** (default) | Anyone a sign-in provider accepts, the first time they sign in, within the [access allowlist](authentication.md#restricting-who-can-sign-in-optional). Anyone invited to a team or created by an admin. |
-| **Invitation only** | Only someone with a pending team invitation sent to their address, or an account an admin creates. A provider sign-in that would create an account is refused with "Sign-up is by invitation only". |
+| **Invitation only** | Only someone with a pending team invitation sent to their address, or an account an admin creates. A provider sign-in that would create an account is refused with "This sign-in cannot create an account". |
 
 Under **Invitation only**, a provider sign-in that would create an account is accepted only when the provider reports the email address as **verified** and the address either has a pending team invitation or is a [root admin](instance-admin.md#root-admins-and-granted-admins).
 
-:::caution[A root admin's first sign-in needs a verified email]
-A root admin is exempt from needing an invitation, but not from needing a verified email. A generic OpenID Connect provider that omits the `email_verified` claim, or an account whose primary email is unverified at the provider, gets "Sign-up is by invitation only" for a root admin who has no account yet. Either sign in once while the mode is still **Open** and switch afterwards, or use a provider that reports verified addresses (Google does; GitHub does for a verified primary email).
+:::caution[A root admin needs a verified email]
+In **every** registration mode, a provider sign-in that would create a root admin's account is accepted only when the provider reports the address as verified. A generic OpenID Connect provider that omits the `email_verified` claim, or an account whose primary email is unverified at the provider, gets "This sign-in cannot create an account" for a root admin who has no account yet. Use a provider that reports verified addresses (Google does; GitHub does for a verified primary email), or the setup page's **Use email and password**. An existing root admin account whose address is not verified holds no root admin power until it is: see [Root admins need a verified email](instance-admin.md#root-admins-need-a-verified-email).
 :::
 
 ## Run an instance on passwords alone
@@ -63,7 +63,7 @@ A root admin is exempt from needing an invitation, but not from needing a verifi
 
 This creates the account if it does not exist yet (or replaces the password of the one that does, ending its sessions), switches password sign-in on, and signs you in. Setup is finished.
 
-The address is treated as verified, because the operator vouches for it. Adding an identity provider later and signing in with the same address links to the same account and keeps the password.
+The address is treated as verified, because the operator vouches for it. The recovery command below does the same. Adding an identity provider later and signing in with the same address links to the same account and keeps the password.
 
 If the setup page says **This browser is signed in**, a signed-in admin's session is taking precedence over the setup session, and only the setup session may set a root admin's password. Use **Sign out here** and the page works again, or open the setup URL in a private window.
 
@@ -75,7 +75,7 @@ So on a password-only instance, losing the last admin password puts the instance
 
 ## Recovery command: set a root admin's password
 
-`./main admin auth password set --email <root-admin-email>` sets the password of a **root** instance admin whose account already exists, reading the password from the terminal or standard input, never from the command line. `--enable-login` also switches password sign-in on. It cannot create the account: for a root admin with no account yet, run `setup rearm` and use **Use email and password** on the setup page. See [Set a root admin's password](lockout-recovery.md#set-a-root-admins-password) for the details.
+`./main admin auth password set --email <root-admin-email>` sets the password of a **root** instance admin whose account already exists, reading the password from the terminal or standard input, never from the command line. `--enable-login` also switches password sign-in on. Because it marks the address verified, it is also how a root admin account from before v0.16.0 gets its root admin power back when the provider does not verify email. It cannot create the account: for a root admin with no account yet, run `setup rearm` and use **Use email and password** on the setup page. See [Set a root admin's password](lockout-recovery.md#set-a-root-admins-password) for the details.
 
 ## Create users and hand over setup links
 
@@ -107,7 +107,9 @@ On the page of an account that has a password:
 
 An account that signs in only through a provider gets **Send a link to set a password** instead: the way back in when the instance loses or switches off that provider.
 
-A new link from an administrator replaces every earlier link of its kind for that account, emailed or shown, including a forgot-password link the person requested themselves. Two cases need another route, for **Reset password** and **Send a link to set a password** alike:
+With no [email provider](instance-email.md) configured, **Get setup link**, **Reset password** and **Send a link to set a password** offer only **Show the link here**. **Email it to &lt;address&gt;** stays visible but disabled, with the note "No email provider is configured, so the link cannot be emailed: show it here and hand it over."
+
+A new link from an administrator replaces every earlier link of its kind for that account, emailed or shown, including a forgot-password link the person requested themselves. The other way round does not apply: a forgot-password request replaces earlier emailed links, including one an administrator emailed, but never a link an administrator showed with **Show the link here** and handed over. Two cases need another route, for **Reset password** and **Send a link to set a password** alike:
 
 - An account that has a sign-in provider connected and an address that is **not verified** (every account from before v0.16.0, until its next provider sign-in with a verified address) cannot be emailed a link: use **Show the link here** and hand it over.
 - A root admin's link is never shown on screen. For a root admin in that position, use the [recovery command](#recovery-command-set-a-root-admins-password) or the setup page.
@@ -122,7 +124,7 @@ A team invitation link works for someone who has no account yet. Signed out, it 
 - Someone whose address already has an account gets **Sign in to accept**.
 - Under **Invitation only**, this is the way in for a new person, together with admin-created accounts.
 
-**The access allowlist still applies.** An invited address that the allowlist does not admit is refused ("Access to this instance is restricted."), so allow the domain or the address before you invite someone outside it.
+**The access allowlist still applies.** An invited address that the allowlist does not admit is refused ("Access to this instance is restricted. Contact your administrator if you believe this is a mistake."), so allow the domain or the address before you invite someone outside it.
 
 **A root admin's address cannot create its account from an invitation.** That account comes from the setup page, the recovery path or a sign-in through a provider.
 
@@ -141,11 +143,11 @@ No email is sent (and the page still says the same) when:
 - the [access allowlist](authentication.md#restricting-who-can-sign-in-optional) does not admit the address;
 - the account has a sign-in provider connected and its address is **not verified**. This covers accounts from before v0.16.0 until their next provider sign-in with a verified address: someone who can no longer use their provider needs an admin to show them a reset link ([Reset or remove a password](#reset-or-remove-a-password)).
 
-An address is verified when the person signs in through a provider that reports it verified, completes an emailed setup or reset link, or when the operator set it up on the setup page. Dev-login accounts never get reset emails.
+An address is verified when the person signs in through a provider that reports it verified, completes an emailed setup or reset link, or when the operator sets it up on the setup page or with the recovery command. A provider sign-in verifies the address only when the provider reports that same address as verified.
 
 ### Without an email provider
 
-With no instance email provider, the forgot-password page shows **Ask your administrator** instead of a form: an admin issues a reset link and hands it over. On such an instance, an address is only ever verified through a sign-in provider that reports it verified. No admin action marks an address verified. See [Instance Email](instance-email.md).
+With no instance email provider, the forgot-password page shows **Ask your administrator** instead of a form: an admin issues a reset link and hands it over. On such an instance, an address is only ever verified through a sign-in provider that reports it verified, or, for a root admin, through the setup page or the recovery command. No action in the admin area marks an address verified. See [Instance Email](instance-email.md).
 
 ## Related
 

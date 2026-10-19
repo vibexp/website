@@ -16,14 +16,14 @@ The bundled `docker-compose.yml` tracks `latest`. Pin to `X.Y.Z` instead if you
 want upgrades to be a deliberate step:
 
 ```yaml
-image: ghcr.io/vibexp/vibexp:0.10.0
+image: ghcr.io/vibexp/vibexp:0.18.0
 ```
 
 **Patch releases are supported on the newest minor line only.** Now that
-`0.10.0` has shipped, fixes go to `0.10.x`, not `0.9.x`. To stay on a supported
+`0.18.0` has shipped, fixes go to `0.18.x`, not `0.17.x`. To stay on a supported
 version, follow the newest minor.
 
-A patch release (`0.10.0` to `0.10.1`) contains bug fixes and security fixes
+A patch release (`0.18.0` to `0.18.1`) contains bug fixes and security fixes
 only. It never adds a database migration and never changes the API, so it is
 always a straight image bump with no action on your side. Anything that needs a
 schema or API change ships as a minor release and appears below if it requires
@@ -36,12 +36,56 @@ in between.
 
 ## Breaking changes
 
+### Audit log (v0.17.0)
+
+This release adds the [instance audit log](audit-log.md). No configuration is
+required, but two things change at the upgrade.
+
+**Audit logging is on from the first start.** Every write, sign-in, team and
+admin change is recorded, and each event stores the client's **IP address and
+user agent**. Events are kept for **2 weeks**, then deleted by a daily purge.
+Both the IP address and the user agent are personal data: if your privacy
+policy does not cover them, switch off **Capture IP address and user agent**
+or change the retention under **Settings** → **Audit log** in the admin area
+before you open the instance to users. See
+[Audit log settings](audit-log.md#audit-log-settings).
+
+**One new database migration, `023_consolidated`, runs on the first start.**
+It adds the `audit_events` and `instance_audit_settings` tables with their
+indexes, and an index on `resource_write_events`.
+It needs no action. The [recovery command](lockout-recovery.md) never runs
+migrations, so start the server once after the upgrade before you use it.
+
+**v0.17.0 is licensed under AGPL-3.0-or-later.** v0.15.0 and v0.16.0
+before it, and v0.18.0 after it, are MIT, and a published release keeps the license it
+shipped with. Upgrading straight to v0.18.0 or later needs nothing for the
+license. See [Open Source](../open-source/README.md#license).
+
 ### Email and password sign-in (v0.16.0)
 
 This release adds [email and password sign-in](password-sign-in.md). **Its
 defaults change nothing**: password sign-in is off, and the registration mode
-is **Open**, which is how every instance worked until now. Three things happen
-at the upgrade itself.
+is **Open**, which is how every instance worked until now. Existing sessions
+stay valid. Four things happen at the upgrade itself.
+
+**A root instance admin now needs a verified email.** An address listed in
+`INSTANCE_ADMIN_EMAILS` (`auth.instance_admins`) holds root admin power only
+once its account's email is verified, and no account from before this release
+is. Until a root admin signs in again through a provider that reports that same
+address as verified (GitHub with a verified primary email, Google, or an OIDC
+provider that sends `email_verified`), the account has no admin area, cannot
+grant or remove admins, and is not protected from suspension or deletion. Sign
+out and back in to restore it. If your provider does not verify email, run
+`./main admin auth password set --email <email>` in the container instead
+([Lockout recovery](lockout-recovery.md#set-a-root-admins-password)): it marks
+the address verified. At every start the server logs one warning per affected
+account:
+
+```text
+Root instance admin account has no verified email and holds no root admin power; sign in once with a provider that verifies email, or run `vibexp admin auth password set --email <email>`
+```
+
+Instance admins granted in the admin area are not affected.
 
 **Email addresses become case-insensitive, and the upgrade stops on a clash.**
 The first start runs a database migration that stores every account's email
@@ -51,7 +95,7 @@ accounts differ only by the case of their address (`Ana@example.com` and
 nothing and the server does not start. The log names the accounts:
 
 ```text
-migration 023 stopped: these accounts have email addresses that differ only by letter case: …
+migration 022 stopped: these accounts have email addresses that differ only by letter case: Ana@example.com (user id …), ana@example.com (user id …). Email addresses become case-insensitive in this release. Nothing was changed. To continue: change the email of, or delete, all but one account in each group; run UPDATE schema_migrations SET version = 21, dirty = false; then start VibeXP again.
 ```
 
 To continue:
@@ -59,7 +103,7 @@ To continue:
 1. For each group it names, change the email of, or delete, every account but
    one.
 2. Mark the failed migration as not applied:
-   `UPDATE schema_migrations SET version = 22, dirty = false;`
+   `UPDATE schema_migrations SET version = 21, dirty = false;`
 3. Start VibeXP again.
 
 Team invitation addresses are stored in lower case too; that cannot clash.
@@ -82,8 +126,9 @@ and an administrator cannot email it a reset
 link either. Someone who can no longer use their provider needs an
 administrator to show them a reset link and hand it over
 ([Reset or remove a password](password-sign-in.md#reset-or-remove-a-password));
-for a root admin, use the recovery command or the setup page instead.
-Dev-login accounts never get reset emails.
+for a root admin, use the recovery command or the setup page instead. A
+provider sign-in verifies the address only when the provider reports that same
+address as verified.
 
 Nothing else needs action. To use passwords, switch them on under
 **Settings** → **Authentication** → **Sign-in and registration**, and

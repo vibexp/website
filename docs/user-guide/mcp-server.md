@@ -29,6 +29,10 @@ VibeXP does not expose MCP "resources" — all reads and writes go through tools
 
 ## Setup Guide
 
+:::tip[Using Claude Code?]
+The in-app **Getting started** walkthrough (profile menu → **Getting started**) walks you through installing the VibeXP Claude Code plugin and the VibeXP CLI. Use the steps below to connect over MCP directly, or from other clients. See the [Quick Start](quick-start.md#the-getting-started-walkthrough).
+:::
+
 ### Prerequisites
 
 1. **VibeXP Account**: Sign up on your deployed VibeXP app (your own VibeXP instance)

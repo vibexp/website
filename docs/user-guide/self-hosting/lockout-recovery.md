@@ -6,7 +6,8 @@ The sign-in providers, password sign-in and the access allowlist are edited in t
 | --- | --- |
 | A provider was disabled and none is left to sign in with | [`providers enable <slug>`](#the-admin-auth-commands) |
 | The only provider is misconfigured (wrong secret, wrong issuer) | [`setup rearm`](#the-admin-auth-commands), then correct it on the setup page |
-| A password-only instance: the root admin's password is lost or was disabled | [`password set --email <root-admin-email>`](#set-a-root-admins-password) |
+| The root admin's password is lost or was disabled | [`password set --email <root-admin-email>`](#set-a-root-admins-password) |
+| After upgrading to v0.16.0 or later, a root admin has no admin portal, and the log says "Root instance admin account has no verified email and holds no root admin power" | Sign in again through a provider that reports that address as verified, or [`password set --email <root-admin-email>`](#set-a-root-admins-password), which marks it verified |
 | A password-only instance: the root admin has no account yet | [`setup rearm`](#the-admin-auth-commands), then **Use email and password** on the setup page |
 | The allowlist shuts out the people who could change it | Sign in as a root admin, who is exempt from the allowlist. If no root admin can sign in either, [`allowlist clear`](#the-admin-auth-commands) |
 | You cannot run a command in the container | [Recovery mode](#recovery-mode) |
@@ -35,15 +36,15 @@ The built-in help and some messages name the binary `vibexp`, as in ``run `vibex
 How they behave:
 
 - They load the same `config.yaml` as the server and connect straight to the database, so inside the container they need no extra configuration.
-- They do not need a running server, and they need no restart: a running server picks the change up within seconds.
-- Every change is recorded in the change history under **Settings** → **Authentication**, where it is attributed to **Server CLI** instead of a user.
+- They do not need a running server, and they need no restart: a running server picks the change up within about 2 seconds.
+- Every change is recorded in the change history under **Settings** → **Authentication**, where it is attributed to **Server CLI** instead of a user. Since v0.17.0, every change is also recorded in the admin [Audit log](audit-log.md), with the actor `recovery-cli`, the channel CLI, and the operating-system user and host name that ran it.
 - They never run database migrations. After an upgrade, start the server once before using them; on a database that is not migrated yet they stop with a message saying so.
 
 | Command | What it does |
 | --- | --- |
 | `providers list` | Lists the stored providers: slug, type, whether each is enabled, its display name, and whether a client secret is stored. The secret itself is never printed. |
 | `providers enable <slug>` | Offers the provider at sign-in again. |
-| `providers disable <slug>` | Stops offering the provider at sign-in. Unlike the admin area, it does not ask for confirmation when this leaves no enabled provider; it tells you that the instance is now in setup mode. |
+| `providers disable <slug>` | Stops offering the provider at sign-in. Unlike the admin area, it does not ask for confirmation when this leaves no enabled provider. If password sign-in still works, it says so and the instance stays out of setup mode; if no sign-in method works any more, it tells you that the instance is now in setup mode. |
 | `allowlist clear` | Removes the access allowlist, so sign-in is open to every account the providers accept. |
 | `setup rearm` | Forces setup mode on and prints a new setup URL, valid for 24 hours. Any earlier setup URL and setup session stop working. |
 | `password set --email <address>` | Sets the password of a root admin whose account exists. See [below](#set-a-root-admins-password). |
@@ -73,7 +74,9 @@ docker exec -it <container> ./main admin auth password set --email admin@example
 - It must be at least 12 characters, not a common password and not the email address.
 - The account's sessions are ended; its API keys are kept.
 - `--enable-login` also switches password sign-in on for the instance, for when it was switched off.
-- The password change itself is not recorded in the change history under **Settings** → **Authentication**. Switching password sign-in on with `--enable-login` is, attributed to **Server CLI**.
+- It marks the address verified, which gives a root admin account from before v0.16.0 its root admin power back (see [Root admins need a verified email](instance-admin.md#root-admins-need-a-verified-email)).
+- It refuses a suspended account, since a password would not let it sign in.
+- The password change itself is not recorded in the change history under **Settings** → **Authentication**. Switching password sign-in on with `--enable-login` is, attributed to **Server CLI**. Since v0.17.0, both are recorded in the admin [Audit log](audit-log.md).
 
 ## Recovery mode
 

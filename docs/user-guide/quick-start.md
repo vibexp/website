@@ -8,7 +8,22 @@ Get started with VibeXP in 5 minutes. This guide will walk you through signing i
 2. On the login page, pick one of the sign-in providers your instance has configured — Google, GitHub, or your organization's own identity provider (OpenID Connect)
 3. Complete the provider's sign-in flow — your VibeXP account is created automatically the first time you sign in
 
-There is no separate signup form, no password to set, and no email verification step — your identity provider handles authentication.
+If your instance has [email and password sign-in](self-hosting/password-sign-in.md) switched on, you can also sign in with a password, or create your account from a team invitation. Otherwise there is no signup form and no password: your identity provider handles authentication.
+
+### The Getting started walkthrough
+
+The first time you open the dashboard, VibeXP opens **Getting started** (`/getting-started`), a walkthrough of about 5 minutes that sets up the read, work, write-back loop for Claude Code:
+
+1. **Welcome**: the shared brain and its loop.
+2. **Building blocks**: memory, blueprints, artifacts and feeds.
+3. **Claude Code plugin**: adds the VibeXP commands, inside Claude Code with `/plugin marketplace add vibexp/plugin-marketplace` and `/plugin install vibexp@vibexp`, or the same from your terminal as `claude plugin …`.
+4. **Team rules**: rules for `~/.claude/CLAUDE.md`, to paste or append with one command.
+5. **VibeXP CLI** (recommended): `claude "/vibexp:install <your VibeXP URL>"` installs the CLI, which lets your agent use short shell commands instead of MCP tool calls.
+6. **All set**: shows live whether your agent has read from VibeXP and written back. Only reads and writes through an AI tool count (the CLI, MCP, or the REST API with an API key), not the web app.
+
+Every step except the first and the last can be skipped with **Skip this step**, and **Skip setup** leaves the walkthrough. It opens by itself at most once per browser session, until you finish it with **Go to VibeXP** or leave it with **Skip setup**. To come back to it, choose **Getting started** in your profile menu or the command palette, or **Resume setup** on the **Finish setting up VibeXP** card on Home.
+
+The steps below cover the same ground by hand, and connect other MCP clients.
 
 :::tip[Project scoping]
 The app header has a global **project selector** (defaulting to "All
