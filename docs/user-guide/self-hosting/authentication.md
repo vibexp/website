@@ -26,10 +26,10 @@ Upgrading an instance that set `AUTH_PROVIDER` and the provider variables? See t
 
 ## First-run setup
 
-The authentication settings sit behind sign-in, and a new instance has no sign-in provider yet. So while **no sign-in provider is enabled**, the instance is in **setup mode**: at startup the server logs a one-time setup URL at `WARN`.
+The authentication settings sit behind sign-in, and a new instance has no way in yet. So while **no sign-in method is usable**, the instance is in **setup mode**: at startup the server logs a one-time setup URL at `WARN`. No sign-in method is usable while no sign-in provider is enabled and no instance admin can sign in with a password (see [Email and Password Sign-In](password-sign-in.md#when-the-last-way-in-is-lost)).
 
 ```json
-{"time":"…","level":"WARN","msg":"SETUP URL: https://<your-app-host>/setup?token=…","reason":"no identity provider is enabled; open this URL to configure sign-in","valid_until":"…"}
+{"time":"…","level":"WARN","msg":"SETUP URL: https://<your-app-host>/setup?token=…","reason":"no sign-in method is usable (no identity provider is enabled, and password login is off or no instance admin has a password); open this URL to configure sign-in","valid_until":"…"}
 ```
 
 The URL is built on `FRONTEND_BASE_URL`, so set that to your public URL first. Find the line in the container logs:
@@ -40,8 +40,8 @@ docker compose logs app | grep "SETUP URL"
 
 1. **Name a root admin before you start.** Set `INSTANCE_ADMIN_EMAILS` to your own email address (see [Instance Admin Portal](instance-admin.md)); with the bundled `docker-compose.yml`, add it to the `app` service's `environment:` block. Setup ends when a root admin signs in, and it is read from the configuration at startup, so adding it later needs a restart.
 2. **Open the setup URL.** The page is headed **Set up sign-in for this instance**. The token is removed from the address bar as soon as the page loads, and a reload continues on the setup session's cookie.
-3. **Add and enable a sign-in provider**, as described in [Sign-in providers](#sign-in-providers) below. You can also set the [access allowlist](#restricting-who-can-sign-in-optional) here.
-4. **Finish.** Once a provider is enabled, a **Finish setup** card appears with a **Sign in with &lt;provider&gt; as a root admin to finish setup** button. Setup is finished when an address listed in `INSTANCE_ADMIN_EMAILS` signs in through an enabled provider.
+3. **Add and enable a sign-in provider**, as described in [Sign-in providers](#sign-in-providers) below. Or, for an instance without providers, use the **Use email and password** card to give the root admin a password: see [Run an instance on passwords alone](password-sign-in.md#run-an-instance-on-passwords-alone). You can also set the [access allowlist](#restricting-who-can-sign-in-optional) here.
+4. **Finish.** Once a provider is enabled, a **Finish setup** card appears with a **Sign in with &lt;provider&gt; as a root admin to finish setup** button. Setup is finished when an address listed in `INSTANCE_ADMIN_EMAILS` signs in through an enabled provider, or with the password set on the setup page.
 
 What to know about the token and the session:
 
@@ -56,7 +56,7 @@ If the setup page shows an error instead:
 | --- | --- | --- |
 | **This setup link is incomplete** | The address has no token and the browser has no setup session to resume. | Open the full `SETUP URL` from the server logs, including its token. |
 | **This setup link is no longer valid** | The token is wrong, was already used to finish setup, or has expired. | Run `setup rearm` for a new URL ([Lockout Recovery](lockout-recovery.md)), or restart the server once the old token has expired. |
-| **This instance is already set up** | Setup mode is off because a sign-in provider is enabled. | Sign in and use **Settings** → **Authentication** in the admin area. If you cannot sign in, see [Lockout Recovery](lockout-recovery.md). |
+| **This instance is already set up** | Setup mode is off because a sign-in method is usable. | Sign in and use **Settings** → **Authentication** in the admin area. If you cannot sign in, see [Lockout Recovery](lockout-recovery.md). |
 
 :::caution[With no root admin, nobody can change the settings afterwards]
 Enabling a provider is enough for people to sign in, but only an instance admin can open **Settings** → **Authentication**. If `INSTANCE_ADMIN_EMAILS` is empty, set it and restart.
@@ -106,6 +106,10 @@ Two changes ask for confirmation before they are applied, because they can lock 
 - **This is the provider you signed in with**: you could not sign in through it again once your session ends.
 
 If someone else saved a change while you were editing, your change is not saved and the page asks you to **Reload** first.
+
+## Email and password sign-in
+
+Since v0.16.0 an instance can also offer sign-in with an email address and a password, beside the providers or instead of them, and can limit new accounts to invited people. It is off by default. See [Email and Password Sign-In](password-sign-in.md).
 
 ## Session & signing keys
 

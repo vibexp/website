@@ -36,6 +36,60 @@ in between.
 
 ## Breaking changes
 
+### Email and password sign-in (v0.16.0)
+
+This release adds [email and password sign-in](password-sign-in.md). **Its
+defaults change nothing**: password sign-in is off, and the registration mode
+is **Open**, which is how every instance worked until now. Three things happen
+at the upgrade itself.
+
+**Email addresses become case-insensitive, and the upgrade stops on a clash.**
+The first start runs a database migration that stores every account's email
+address in lower case and makes addresses unique regardless of case. If two
+accounts differ only by the case of their address (`Ana@example.com` and
+`ana@example.com`), nothing can choose between them, so the migration changes
+nothing and the server does not start. The log names the accounts:
+
+```text
+migration 023 stopped: these accounts have email addresses that differ only by letter case: …
+```
+
+To continue:
+
+1. For each group it names, change the email of, or delete, every account but
+   one.
+2. Mark the failed migration as not applied:
+   `UPDATE schema_migrations SET version = 22, dirty = false;`
+3. Start VibeXP again.
+
+Team invitation addresses are stored in lower case too; that cannot clash.
+
+**One account can hold several sign-in methods.** Sign-in identities move to
+their own table, so an account can have a password and several providers. A
+sign-in through another provider that reports a **verified** address matching
+an existing account connects to that account, but only once the account's own
+address is verified. No account from before this release is: until it has
+signed in once through its own provider with a verified address, a sign-in
+through a different provider is refused with "Sign in the way you did before".
+People can see and disconnect their methods under **Settings** → **Account
+settings** ([Signing In and Your Account](../account-and-sign-in.md#sign-in-methods)).
+
+**Existing provider accounts get no reset email until their address is
+verified.** Accounts created before this release have no record of whether
+their address was verified. Such an account gets no forgot-password email
+until its next sign-in through a provider that reports the address verified,
+and an administrator cannot email it a reset
+link either. Someone who can no longer use their provider needs an
+administrator to show them a reset link and hand it over
+([Reset or remove a password](password-sign-in.md#reset-or-remove-a-password));
+for a root admin, use the recovery command or the setup page instead.
+Dev-login accounts never get reset emails.
+
+Nothing else needs action. To use passwords, switch them on under
+**Settings** → **Authentication** → **Sign-in and registration**, and
+[configure an email provider](instance-email.md) so that people can reset
+their own passwords.
+
 ### Company branding moved to Site info (v0.15.0)
 
 The company branding of an instance (its name, logo, support and legal links)

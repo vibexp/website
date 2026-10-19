@@ -59,13 +59,13 @@ See [Authentication & MCP Auth](authentication.md) for how sign-in is configured
 Instance admins get an **`/admin` portal** in the web app, reachable from the **Admin Portal** entry in the user menu:
 
 - **Dashboard**: instance-wide counts (users, teams, prompts, artifacts, memories) and the running backend version.
-- **Users**: a list of all users with their team counts, and a detail view showing each user's team memberships and role per team.
+- **Users**: a list of all users with their team counts, and a detail view showing each user's team memberships and role per team. Since v0.16.0 an admin can also create users before they sign in, hand over setup links, and reset or remove passwords: see [Email and Password Sign-In](password-sign-in.md#create-users-and-hand-over-setup-links).
 - **Teams**: a list of all teams with owner and member count, and a detail view showing the owner and full member list.
 - **Projects**: a list of every project on the instance.
 
 Since v0.15.0 the portal is also where the instance's settings are edited, under **Settings**:
 
-- **Authentication**: the sign-in providers, the access allowlist, the instance admins, and a change history with a tab for each (**Providers**, **Allowlist**, **Admins**, **Setup**). See [Authentication & MCP Auth](authentication.md). If a change there locks you out, see [Lockout Recovery](lockout-recovery.md).
+- **Authentication**: password sign-in and the registration mode, the sign-in providers, the access allowlist, the instance admins, and a change history with a tab for each (**Providers**, **Allowlist**, **Admins**, **Setup**, and since v0.16.0 **Sign-in policy**). See [Authentication & MCP Auth](authentication.md). If a change there locks you out, see [Lockout Recovery](lockout-recovery.md).
 - **Site info**: the company name, logo and links shown across the instance and in its emails. See [Site Info (Branding)](site-info.md).
 - **Email**: the instance's outbound mail. See [Instance Email](instance-email.md).
 - **Search** and **AI Summary**: the search ranking and AI summary defaults. See [Search & AI Summary Settings](search-and-ai-summary-settings.md).

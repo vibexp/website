@@ -8,7 +8,12 @@ It carries:
 
 - invitations, notifications and daily digests for every team that has not
   configured [its own provider](../integrations/email-provider.md);
-- support requests from the contact form, always, whatever the team uses.
+- support requests from the contact form, always, whatever the team uses;
+- the account emails of [password sign-in](password-sign-in.md): setup links, password reset links and password-change notices.
+
+:::note[Without a provider, addresses are verified only through sign-in providers]
+A password reset email goes only to an address that is verified, or to an account with no sign-in provider connected. On an instance without an email provider, an account's address is only ever verified through a sign-in provider that reports it verified: completing an emailed setup or reset link would also verify it, but that needs email, and no administrator action marks an address verified.
+:::
 
 :::caution[Unconfigured instance mail is discarded, not queued]
 Until a provider is stored here, every message the instance would send is
