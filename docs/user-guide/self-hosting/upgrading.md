@@ -56,7 +56,7 @@ indexes, and an index on `resource_write_events`.
 It needs no action. The [recovery command](lockout-recovery.md) never runs
 migrations, so start the server once after the upgrade before you use it.
 
-**v0.17.0 alone is licensed under AGPL-3.0-or-later.** v0.15.0 and v0.16.0
+**v0.17.0 is licensed under AGPL-3.0-or-later.** v0.15.0 and v0.16.0
 before it, and v0.18.0 after it, are MIT, and a published release keeps the license it
 shipped with. Upgrading straight to v0.18.0 or later needs nothing for the
 license. See [Open Source](../open-source/README.md#license).
