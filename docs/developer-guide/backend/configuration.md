@@ -162,6 +162,7 @@ the full model.
 | `auth.access_allowlist.domains` | `[]` | **Deprecated since v0.15.0** (imported at startup while no allowlist is stored, otherwise ignored). Allowed email domains (matched exactly against the part after the last `@`). |
 | `auth.access_allowlist.emails` | `[]` | **Deprecated since v0.15.0**, like `domains`. Allowed exact email addresses. A user may sign in if **either** list matches; both empty means open registration. While active, sign-in also requires a provider-verified email (unverified accounts are denied). |
 | `auth.recovery_mode` | `false` | Break-glass after an authentication lockout: forces setup mode on and logs a new one-time `SETUP URL` on every start, while the stored providers keep working. Wired to `AUTH_SETTINGS_RECOVERY_MODE` in the Docker config. |
+| `auth.session_recheck_interval` | `15m` | Since v0.19.0. How often a session signed in through an identity provider that issued a refresh token is re-checked against it; a refused refresh ends the session. Must be positive. Wired to `AUTH_SESSION_RECHECK_INTERVAL` in the Docker config. See [Single Sign-On](../../user-guide/self-hosting/single-sign-on.md#access-re-check). |
 | `auth.instance_admins` | `[]` | Emails designated as **root** instance administrators; further admins are granted in the admin area. Drives `is_instance_admin` and the `/api/v1/admin` portal; matched case-insensitively and validated as emails at startup. |
 
 :::caution

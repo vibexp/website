@@ -19,7 +19,7 @@ The MCP authorization spec separates two roles. VibeXP plays **both**, so an MCP
 VibeXP mints short-lived JWTs (audience = your `MCP_RESOURCE_URI`), signs them with DB-stored keys it rotates, and publishes its own JWKS. Compliance is therefore **constant across providers**.
 
 :::note[Where each setting lives]
-Since v0.15.0 the **sign-in providers** and the **access allowlist** are stored in the database and managed in the admin area under **Settings** → **Authentication**; a change applies with no restart. Everything else on this page is still read from the backend's `config.yaml`: the root instance admins, the session and encryption keys, and the embedded Authorization Server. In the published image an env var only works when the baked `/app/config.yaml` references it as `${VAR}`, which covers `INSTANCE_ADMIN_EMAILS`, `SESSION_ENCRYPTION_KEY`, `OAUTH_AS_ISSUER_URL`, `MCP_RESOURCE_URI` and `AUTH_SETTINGS_RECOVERY_MODE`. Settings marked "mounted `config.yaml`" below are **not** env-wired: mount your own file over `/app/config.yaml` to set them.
+Since v0.15.0 the **sign-in providers** and the **access allowlist** are stored in the database and managed in the admin area under **Settings** → **Authentication**; a change applies with no restart. Everything else on this page is still read from the backend's `config.yaml`: the root instance admins, the session and encryption keys, and the embedded Authorization Server. In the published image an env var only works when the baked `/app/config.yaml` references it as `${VAR}`, which covers `INSTANCE_ADMIN_EMAILS`, `SESSION_ENCRYPTION_KEY`, `OAUTH_AS_ISSUER_URL`, `MCP_RESOURCE_URI`, `AUTH_SETTINGS_RECOVERY_MODE` and, since v0.19.0, `AUTH_SESSION_RECHECK_INTERVAL`. Settings marked "mounted `config.yaml`" below are **not** env-wired: mount your own file over `/app/config.yaml` to set them.
 
 Upgrading an instance that set `AUTH_PROVIDER` and the provider variables? See the [v0.15.0 upgrade note](upgrading.md#sign-in-providers-and-the-access-allowlist-moved-to-the-database-v0150).
 :::
@@ -80,6 +80,7 @@ An instance admin manages the providers in the admin area: open **Admin Portal**
 | **Client secret** | Stored encrypted and never shown again. When you edit a provider, leave it blank to keep the stored one; if you change the issuer URL, enter it again. |
 | **Redirect URI** | Read-only, with a **Copy redirect URI** button. See below. |
 | **Enabled** | Whether the provider is offered on the sign-in page. |
+| **Role mapping (optional)** | OpenID Connect only, since v0.19.0. The **Roles claim** and the **Admin values** that make a user an instance admin. See [Single Sign-On](single-sign-on.md#role-mapping). |
 
 **The redirect URI is the same for every provider and is not configurable**: it is always `<FRONTEND_BASE_URL>/api/v1/auth/callback`. Copy it from the dialog and register it in the provider's console. The `GOOGLE_REDIRECT_URI`, `GITHUB_REDIRECT_URI` and `OIDC_REDIRECT_URI` variables of earlier releases are ignored. The one exception is a localhost `FRONTEND_BASE_URL`, where the redirect URI is `http://localhost:<server port>/api/v1/auth/callback`.
 
@@ -88,6 +89,8 @@ In each provider's console:
 - **Google**: create an OAuth 2.0 client ID of type **Web application** in the Google Cloud console, and paste the redirect URI from the dialog under **Authorized redirect URIs**.
 - **GitHub**: create an **OAuth App** under your account or organization's developer settings, and paste the redirect URI from the dialog as the **Authorization callback URL**. This is the web-login OAuth client, not the per-team [GitHub App](../integrations/github-app.md).
 - **OpenID Connect** (Keycloak, Zitadel, Auth0, Okta, WorkOS, …): create a confidential web client with the authorization code flow, and paste the redirect URI from the dialog into its allowed redirect URIs. Use the provider's issuer as the **Issuer URL**; VibeXP reads the rest from the issuer's discovery document.
+
+For an organisation's identity provider, with instance admins from its groups or roles and a periodic re-check of signed-in sessions, see [Single Sign-On](single-sign-on.md) and its guides for Okta, Microsoft Entra ID, Keycloak, a generic OpenID Connect provider and Google Workspace.
 
 ### Test, reorder, disable, delete
 
@@ -100,10 +103,11 @@ Each row shows the provider's type, a health badge and its slug, with these cont
 
 The health badge is **Healthy**, **Unhealthy**, **Disabled** or **Unknown**. An **Unhealthy** provider is enabled but could not be built, for example because its issuer cannot be reached; the row says why, and the provider is **not offered for sign-in** until it builds again. One broken provider never stops the others.
 
-Two changes ask for confirmation before they are applied, because they can lock you out. Confirm with **Apply anyway** only if you have another way in:
+These changes ask for confirmation before they are applied, because they can lock you out. Confirm with **Apply anyway** only if you have another way in:
 
 - **This leaves no way to sign in**: the change would leave no enabled provider. The instance returns to setup mode, and the way back in is a setup URL ([Lockout Recovery](lockout-recovery.md)).
 - **This is the provider you signed in with**: you could not sign in through it again once your session ends.
+- **This removes your own admin access**: since v0.19.0, you are an instance admin only through this provider's [role mapping](single-sign-on.md#role-mapping), and the change would end that.
 
 If someone else saved a change while you were editing, your change is not saved and the page asks you to **Reload** first.
 
@@ -118,7 +122,7 @@ ENCRYPTION_KEY=<32 raw bytes>            # AES-256 at-rest key: app data + OAuth
 SESSION_ENCRYPTION_KEY=<64 hex chars>   # encrypts the web app session cookie (vx_session)
 ```
 
-The web app keeps a server-side cookie session; the embedded Authorization Server is for MCP / programmatic OAuth clients. Both share the same provider config and user provisioning. The AS's JWT signing keys are generated, stored encrypted in the database, rotated, and served via JWKS — there are **no key files** to manage, and it is multi-instance safe.
+The web app keeps a cookie session. Since v0.19.0 the session is stored server-side: the cookie carries only a random session id, and the identity provider's tokens are stored in the database, encrypted with `ENCRYPTION_KEY`. Rotating `ENCRYPTION_KEY` therefore ends every session that holds identity-provider tokens, and those users sign in again. Sessions from an OpenID Connect provider are re-checked against it every `auth.session_recheck_interval` (default `15m`): see [Access re-check](single-sign-on.md#access-re-check). The embedded Authorization Server is for MCP / programmatic OAuth clients. Both share the same provider config and user provisioning. The AS's JWT signing keys are generated, stored encrypted in the database, rotated, and served via JWKS — there are **no key files** to manage, and it is multi-instance safe.
 
 ## Enable the embedded Authorization Server (MCP auth)
 
@@ -192,10 +196,11 @@ If the allowlist locks out everyone who could fix it, see [Lockout Recovery](loc
 
 ## Designating instance admins (optional)
 
-Instance admins get the admin portal, which is where the settings above live. There are two kinds:
+Instance admins get the admin portal, which is where the settings above live. They come from three sources:
 
 - **Root admins** are listed in `INSTANCE_ADMIN_EMAILS` (comma-separated), or `auth.instance_admins` in a mounted `config.yaml`. They are read from the configuration at startup.
 - **Granted admins** are added by a root admin in the **Instance admins** card under **Settings** → **Authentication**.
+- **Provider-sourced admins**, since v0.19.0, come from an OpenID Connect provider's [role mapping](single-sign-on.md#role-mapping).
 
 ```bash
 INSTANCE_ADMIN_EMAILS=admin@example.com

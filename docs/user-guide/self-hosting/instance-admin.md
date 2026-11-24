@@ -10,7 +10,7 @@ The role is dormant by default: with no instance admins configured, no one has t
 
 ## Root admins and granted admins
 
-There are two kinds of instance admin. Both open the same portal; they differ in where the role comes from and in who can change it.
+There are two kinds of instance admin. Both open the same portal; they differ in where the role comes from and in who can change it. Since v0.19.0 there is a third source, an identity provider's role mapping: see [Admins from the identity provider](#admins-from-the-identity-provider).
 
 | | Root admin | Granted admin |
 | --- | --- | --- |
@@ -46,11 +46,17 @@ Name at least one before you set up sign-in: [first-run setup](authentication.md
 
 ### Grant the role to someone else
 
-Open **Settings** → **Authentication** in the portal. The **Instance admins** card lists the root admins, each with a **config** badge, followed by the granted admins and the date each was granted.
+Open **Settings** → **Authentication** in the portal. The **Instance admins** card lists the root admins, each with a **Server configuration** badge, followed by the granted admins with a **Granted** badge and the date each was granted, and the admins from an identity provider with an **Identity provider** badge.
 
 A root admin sees a **Grant instance admin to** field on that card: enter the email address of an existing, active user and press **Grant**. **Remove** next to a granted admin takes the role away again: they keep their account and their teams, and lose the portal on their next request. A granted admin who is suspended does not hold the role while suspended.
 
 A granted admin sees the same list without those controls. A root admin cannot be granted or removed here, since their role comes from the configuration.
+
+### Admins from the identity provider
+
+Since v0.19.0 an OpenID Connect sign-in provider can carry a role mapping: a claim, such as `groups`, and the values that make a user an instance admin. Such an admin is listed with the **Identity provider** badge, the provider's name and the value that matched. They have the powers of a granted admin, not of a root admin, and their role follows the identity provider: it is evaluated at every sign-in and every session re-check, so it can only be changed there or in the role mapping, not with **Remove**. See [Single Sign-On](single-sign-on.md#admin-sources).
+
+Root admins are never added or removed by a role mapping, which is what makes them the break-glass path when the identity provider or the mapping is wrong.
 
 See [Authentication & MCP Auth](authentication.md) for how sign-in is configured, and the [Configuration reference](../../developer-guide/deployment/configuration-reference.md) for all config options.
 
