@@ -36,6 +36,18 @@ in between.
 
 ## Breaking changes
 
+### Server-side sessions and single sign-on (v0.19.0)
+
+This release (expected as v0.19.0) adds [single sign-on](single-sign-on.md) features: instance admins from an OpenID Connect provider's role mapping, and a periodic re-check of signed-in sessions against the provider. **Its defaults need no action**: no provider has a role mapping until an admin sets one. Four things change at the upgrade itself.
+
+**Sessions are stored server-side, and nobody is signed out.** The first start runs migrations `024` to `026`; `026_sessions` adds a `sessions` table. The `vx_session` cookie now carries only a random session id, and the identity provider's access and refresh tokens move into that table, encrypted with `ENCRYPTION_KEY`. A cookie from before the upgrade is converted on its first request, so people stay signed in. Signing out now deletes the stored session, so a copy of the cookie stops working too.
+
+**Rotating `ENCRYPTION_KEY` now ends sessions.** The stored tokens no longer decrypt after a key change, so every session that holds identity-provider tokens answers 401 and its user signs in again. Plan a key rotation as a sign-out of those users.
+
+**OpenID Connect sessions are re-checked.** VibeXP now requests `offline_access` from an OpenID Connect provider that lists it in its discovery document, and refreshes the session at least every `auth.session_recheck_interval` (default `15m`, `AUTH_SESSION_RECHECK_INTERVAL` in the published image). A provider that refuses the refresh ends the session. A session that signed in before the upgrade without a refresh token is re-checked only after its next sign-in. See [Access re-check](single-sign-on.md#access-re-check).
+
+**A sign-in in progress during the upgrade fails once.** Every sign-in now sends PKCE and a `nonce`, and a sign-in started on the old version cannot complete on the new one. Starting it again works. Generic OpenID Connect providers no longer receive `access_type=offline`; only Google does.
+
 ### Email and password sign-in (v0.16.0)
 
 This release adds [email and password sign-in](password-sign-in.md). **Its
